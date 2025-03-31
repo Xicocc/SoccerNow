@@ -6,7 +6,7 @@
 
 **Projeto Prático #1:**  
  - O projeto deve ser desenvolvido por grupos de **no máximo três alunos**.  
- - Devem identificar no ficheiro readme quais são os conjuntos de casos de uso que cada um dos alunos ira resolver.
+ - Devem identificar no ficheiro `Readme.md` os integrantes do grupo, o número, e quais são os conjuntos de casos de uso que cada um dos alunos ira resolver.
 
  **Plágio:**  
  - Além de inspeção manual, será utilizado um software de deteção de plágio no código-fonte do projeto.  
