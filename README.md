@@ -1,93 +1,100 @@
-# soccernow
+# SoccerNow: Gestão de Jogos de Futsal
 
+# Esse ficheiro deve ser rescrito com base nas informações descritas no enunciado do projeto.
 
+---
 
-## Getting started
+**Projeto Prático #1:**  
+ - O projeto deve ser desenvolvido por grupos de **no máximo três alunos**.  
+ - Devem identificar no ficheiro readme quais são os conjuntos de casos de uso que cada um dos alunos ira resolver.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+ **Plágio:**  
+ - Além de inspeção manual, será utilizado um software de deteção de plágio no código-fonte do projeto.  
+ - **Todos** os alunos que submeterem código obtido através de plágio terão os seus projetos anulados.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+ **Uso de Inteligência Artificial:**  
+ - É permitido utilizar ferramentas de IA como ChatGPT, Copilot, DeepSeek e similares.  
+ - Contudo, todos os membros do grupo devem ser capazes de **compreender e explicar** o projeto **na sua totalidade** aos docentes quando solicitado.  Se houver código que o grupo não consiga explicar, o projeto será considerado como **plágio**.
 
-## Add your files
+**Submissão:**  
+ - A data de submissão do projeto é **01/05/2025** às 23:59.  
+ - A descrição do processo de submissão encontra-se no enunciado.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+---
 
+## Tarefas da Fase 1
+
+A equipa deverá:
+
+- Fazer *fork* do repositório original: [https://git.alunos.di.fc.ul.pt/css000/soccernow](https://git.alunos.di.fc.ul.pt/css000/soccernow) para a conta de um dos elementos do grupo.
+- Dar acesso a todos os membros do grupo como **Maintainer**.
+- Dar acesso à conta **css000** como **Reporter**.
+- Alterar o `Readme.md` para identificar a equipa e indicar qual conjunto de casos de uso cada membro implementará.
+- Criar uma pasta `docs` contendo um único documento PDF com todos os diagramas do projeto.
+- Desenhar o modelo de domínio, considerando todos os casos de uso, e colocá-lo na pasta `docs`.
+- Desenhar o diagrama de sequência (SSD) para o caso de uso **H**.
+- Esboçar o diagrama de classes que demonstre a divisão em camadas.
+- Anotar as classes relevantes com as anotações JPA para garantir o melhor mapeamento possível.
+- Justificar, no relatório, cada decisão tomada no mapeamento JPA.
+- Incluir no relatório as garantias que o sistema oferece em relação à lógica de negócio.
+- Gerar a base de dados a partir das anotações.
+- Implementar testes que garantam a correção da lógica de negócio.
+- Implementar os endpoints REST necessários (acessíveis via Swagger) para os casos de uso implementados.
+
+---
+
+## Como Entregar
+
+Para entregar o trabalho, crie uma tag chamada `fase1` e envie-a para o repositório. O repositório deverá conter:
+- O código-fonte do projeto.
+- Os ficheiros necessários para executar o projeto em Docker.
+- Um único documento PDF na pasta `docs` com todos os diagramas.
+
+Execute os seguintes comandos:
+
+```bash
+git tag fase1
+git push origin fase1
 ```
-cd existing_repo
-git remote add origin https://git.alunos.di.fc.ul.pt/css000/soccernow.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+### Atenção:
+Confirme que o projeto está acessível à conta CSS000 na tag fase1. Caso contrário, a entrega receberá nota 0. Certifique-se de que o projeto pode ser executado sem erros de compilação ou outros impedimentos, dentro do ambiente docker.
 
-- [ ] [Set up project integrations](https://git.alunos.di.fc.ul.pt/css000/soccernow/-/settings/integrations)
+---
 
-## Collaborate with your team
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+# FAQ
 
-## Test and Deploy
+## Preciso de `sudo` para correr o `run.sh`
+Tenta correr `sudo usermod -aG docker $USER` seguido de um log-out na máquina.
+Ou tentar [desta forma](https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket)
 
-Use the built-in continuous integration in GitLab.
+## O Docker não instala em ubuntu.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Tentar [desta forma](https://askubuntu.com/a/1411717).
 
-***
+## O `run.sh` não está a correr no meu macos m1.
 
-# Editing this README
+Tentar correr `docker ps`. Se não funcionar, [tentar isto](https://stackoverflow.com/a/68202428/28516).
+Confirmar também que está instalado o Docker Desktop (`brew install --cask docker`) e não apenas a command-line tool (`brew install docker`). A aplicação Docker deve também estar a correr (icon na menubar).
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
 
-## Suggestions for a good README
+## Estou em windows e o `bash setup.sh` não funciona
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Correr numa bash (tanto a Git Bash, MSys2 bash ou WSL em linux) e não na Powershell, nem no CMD.exe.
 
-## Name
-Choose a self-explaining name for your project.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Estou em windows, tenho o python instalado mas ao correr o `bash setup.sh` ele não encontra o pip
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Deve adicionar o pip ao PATH. Procure em `C:\Users\<vosso_user>\AppData\Local\Programs\Python\<versao_do_python>\Scripts`. 
+Atenção pois essa pasta potencialmente estará oculta.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## `docker compose` não funciona
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+`docker compose` é o comando da última versão de docker. `docker-compose` é a versão antiga. Devem actualizar o docker.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Ao executar o `bash run.sh` tenho um erro 401 e não consigo descarregar as imagens
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Deve no terminal fazer logout do docker `docker logout` e refazer o login `docker login`.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
