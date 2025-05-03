@@ -1,10 +1,11 @@
 # SoccerNow: Gestão de Jogos de Futsal
 
-# Alunos:.
+# Alunos:
  - Martim Neto 56279
  - Francisco Carvalho 52838
 ---
-
+# Notas:
+ - Manual code formatting: find src -name "*.java" -exec java -jar .cache/google-java-format-1.25.2-all-deps.jar -n {} \;
 **Projeto Prático #1:**
  - O projeto deve ser desenvolvido por grupos de **no máximo três alunos**.
  - Devem identificar no ficheiro `Readme.md` os integrantes do grupo, o número, e quais são os conjuntos de casos de uso que cada um dos alunos ira resolver.
