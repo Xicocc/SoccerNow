@@ -1,4 +1,4 @@
-package pt.ul.fc.css.soccernow.service;
+package pt.ul.fc.css.soccernow.services;
 
 import java.util.List;
 import org.springframework.stereotype.Service;

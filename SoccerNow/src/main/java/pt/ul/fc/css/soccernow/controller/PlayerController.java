@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ul.fc.css.soccernow.model.Player;
 import pt.ul.fc.css.soccernow.model.Position;
-import pt.ul.fc.css.soccernow.service.PlayerService;
+import pt.ul.fc.css.soccernow.services.PlayerService;
 
 @RestController
 @RequestMapping("/api/players")

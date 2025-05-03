@@ -56,6 +56,24 @@ class Player <<Entity>> {
     + setPreferredPosition(pos: Position): void
 }
 
+class Team <<Entity>> {
+    - id: Long <<GeneratedValue>>
+    - name: String <<Unique>>
+    - wins: int = 0
+    - players: List<Player> <<ManyToMany>>
+    --
+    + Team()
+    + Team(name: String, players: List<Player>)
+    + getId(): Long
+    + getName(): String
+    + setName(name: String): void
+    + getWins(): int
+    + setWins(wins: int): void
+    + getPlayers(): List<Player>
+    + setPlayers(players: List<Player>): void
+    + getPlayerIds(): List<Long>
+}
+
 class Referee <<Entity>> {
     - gamesParticipated: int = 0
     --
@@ -65,6 +83,7 @@ class Referee <<Entity>> {
     + setGamesParticipated(games: int): void
 }
 
+' ====== REPOSITORIES ======
 interface UserRepository <<Repository>> {
     + findByName(name: String): User
     + findAllUsers(): List<User>
@@ -81,6 +100,21 @@ interface PlayerRepository <<Repository>> {
     + findTopPlayersByRedCards(limit: int): List<Player>
     __
     <<Extends UserRepository>>
+}
+
+interface TeamRepository <<Repository>> {
+    + existsByName(name: String): boolean
+    + findAllTeams(): List<Team>
+    + findByName(name: String): Optional<Team>
+    + findByPlayerId(playerId: Long): List<Team>
+    + findTeamsByMostPlayers(): List<Team>
+    + findTopTeamsByPlayerCount(limit: int): List<Team>
+    + findByPlayerName(playerName: String): List<Team>
+    + findTeamsWithLessThan5Players(): List<Team>
+    + findTeamsWithMostCards(): List<Team>
+    + findTeamsWithMostWins(): List<Team>
+    __
+    <<JpaRepository<Team, Long>>>
 }
 
 interface RefereeRepository <<Repository>> {
@@ -116,9 +150,31 @@ class PlayerService <<Service>> {
     + addGamesPlayed(playerId: Long, games: int): Player
     __
     <<@Service>>
+}
+
+class TeamService <<Service>> {
+    - teamRepository: TeamRepository
+    - playerRepository: PlayerRepository
+    - userRepository: UserRepository
+    __
+    + registerTeam(dto: TeamRegistrationDTO): Team
+    + getAllTeams(): List<Team>
+    + getTeamById(teamId: Long): Team
+    + addPlayerToTeam(teamId: Long, userId: Long): Team
+    + removePlayerFromTeam(teamId: Long, userId: Long): Team
+    + getTeamPlayers(teamId: Long): List<Player>
+    + getTeamsWithPlayer(userId: Long): List<Team>
+    + getTeamsWithLessThan5Players(): List<Team>
+    + getTeamsWithMostCards(): List<Team>
+    + getTeamsWithMostWins(): List<Team>
+    + addWins(teamId: Long, wins: int): Team
+    + getTeamCardCount(teamId: Long): int
+    + getTeamsWithPlayerName(playerName: String): List<Team>
+    __
+    <<@Service>>
     Throws:
     - IllegalArgumentException
-    - PlayerNotFoundException
+    - TeamNotFoundException
 }
 
 class RefereeService <<Service>> {
@@ -131,9 +187,6 @@ class RefereeService <<Service>> {
     + addGamesParticipated(refereeId: Long, games: int): Referee
     __
     <<@Service>>
-    Throws:
-    - IllegalArgumentException
-    - RefereeNotFoundException
 }
 
 ' ====== CONTROLLERS ======
@@ -153,6 +206,25 @@ class PlayerController <<Controller>> {
     <<@RequestMapping("/api/players")>>
 }
 
+class TeamController <<Controller>> {
+    - teamService: TeamService
+    __
+    + registerTeam(dto: TeamRegistrationDTO): ResponseEntity<Team>
+    + getAllTeams(): ResponseEntity<List<Team>>
+    + getTeamById(id: Long): ResponseEntity<Team>
+    + getTeamsWithLessThan5Players(): ResponseEntity<List<Team>>
+    + getTeamsWithMostCards(): ResponseEntity<List<Team>>
+    + getTeamsWithMostWins(): ResponseEntity<List<Team>>
+    + addWins(id: Long, wins: int): ResponseEntity<Team>
+    + addPlayerToTeam(teamId: Long, playerId: Long): ResponseEntity<Team>
+    + removePlayerFromTeam(teamId: Long, playerId: Long): ResponseEntity<Team>
+    + getTeamPlayers(id: Long): ResponseEntity<List<Player>>
+    + getTeamsWithPlayer(playerId: Long): ResponseEntity<List<Team>>
+    __
+    <<@RestController>>
+    <<@RequestMapping("/api/teams")>>
+}
+
 class RefereeController <<Controller>> {
     - refereeService: RefereeService
     __
@@ -164,21 +236,14 @@ class RefereeController <<Controller>> {
     <<@RequestMapping("/api/referees")>>
 }
 
-class UserController <<Controller>> {
-    - userService: UserService
-    __
-    + getAllUsers(): ResponseEntity<List<UserDTO>>
-    __
-    <<@RestController>>
-    <<@RequestMapping("/api/users")>>
-}
-
 class RegistrationController <<Controller>> {
     - playerService: PlayerService
     - refereeService: RefereeService
+    - teamService: TeamService
     __
     + registerPlayer(dto: PlayerRegistrationDTO): ResponseEntity<Player>
     + registerReferee(dto: RefereeRegistrationDTO): ResponseEntity<Referee>
+    + registerTeam(dto: TeamRegistrationDTO): ResponseEntity<Team>
     __
     <<@RestController>>
     <<@RequestMapping("/api/auth")>>
@@ -195,6 +260,14 @@ class PlayerRegistrationDTO <<DTO>> {
     - @NotBlank name
     - @Min(16) age
     - @NotNull position
+}
+
+class TeamRegistrationDTO <<DTO>> {
+    - name: String
+    __
+    <<Record>>
+    Validation:
+    - @NotBlank name
 }
 
 class RefereeRegistrationDTO <<DTO>> {
@@ -218,10 +291,12 @@ class UserDTO <<DTO>> {
     + fromUser(user: User): UserDTO
 }
 
-
 ' ====== INHERITANCE ======
 User <|-- Player
 User <|-- Referee
+
+' ====== RELATIONSHIPS ======
+Team "1" *-- "0..*" Player : players
 
 ' ====== COMPOSITION/AGGREGATION ======
 Player --> Position
@@ -230,21 +305,32 @@ PlayerController --> PlayerService
 PlayerService --> PlayerRepository
 PlayerRepository --> Player
 
+TeamController --> TeamService
+TeamService --> TeamRepository
+TeamRepository --> Team
+
+TeamService --> PlayerRepository
+TeamService --> UserRepository
+
 RefereeController --> RefereeService
 RefereeService --> RefereeRepository
 RefereeRepository --> Referee
 
 RegistrationController --> PlayerService
 RegistrationController --> RefereeService
+RegistrationController --> TeamService
 
 ' ====== DEPENDENCIES ======
 PlayerService ..> PlayerRegistrationDTO
+TeamService ..> TeamRegistrationDTO
 RefereeService ..> RefereeRegistrationDTO
 UserService ..> UserDTO
 
 note top of User: Base class for all users\nContains common fields
 note bottom of Player: Extends User\nTracks player-specific stats
+note bottom of Team: Manages team composition\nand win tracking
 note bottom of Referee: Extends User\nTracks referee-specific data
+
 ' ====== QUERY ANNOTATIONS ======
 note top of PlayerRepository
   <<@Repository>>
@@ -252,6 +338,15 @@ note top of PlayerRepository
   - Position filtering
   - Goals average calculation
   - Red cards ranking
+end note
+
+note top of TeamRepository
+  <<@Repository>>
+  Custom JPQL queries:
+  - Teams by player count
+  - Teams by cards
+  - Teams by wins
+  - Player membership checks
 end note
 
 note bottom of RefereeRepository

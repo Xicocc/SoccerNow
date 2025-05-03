@@ -8,6 +8,8 @@ import pt.ul.fc.css.soccernow.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
   User findByName(String name);
 
+  boolean existsByName(String name);
+
   @Query("SELECT u FROM User u")
   List<User> findAllUsers();
 }

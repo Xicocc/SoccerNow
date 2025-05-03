@@ -50,4 +50,12 @@ public class GlobalExceptionHandler {
     error.put("error", ex.getMessage());
     return error;
   }
+
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(TeamNotFoundException.class)
+  public Map<String, String> handleTeamNotFound(TeamNotFoundException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", ex.getMessage());
+    return error;
+  }
 }

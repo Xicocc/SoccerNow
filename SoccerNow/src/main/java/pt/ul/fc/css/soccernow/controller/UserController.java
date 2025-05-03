@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ul.fc.css.soccernow.dto.UserDTO;
-import pt.ul.fc.css.soccernow.service.UserService;
+import pt.ul.fc.css.soccernow.services.UserService;
 
 @RestController
 @RequestMapping("/api/users")

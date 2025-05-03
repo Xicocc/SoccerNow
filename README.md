@@ -1,8 +1,8 @@
 # SoccerNow: Gestão de Jogos de Futsal
 
 # Alunos:
- - Martim Neto 56279
- - Francisco Carvalho 52838
+ - Martim Neto 56279 - Conjunto C1
+ - Francisco Carvalho 52838 - Conjunto C2
 ---
 # Notas:
  - Manual code formatting: find src -name "*.java" -exec java -jar .cache/google-java-format-1.25.2-all-deps.jar -n {} \;

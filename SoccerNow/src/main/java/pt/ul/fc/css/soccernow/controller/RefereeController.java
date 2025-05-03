@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ul.fc.css.soccernow.model.Referee;
-import pt.ul.fc.css.soccernow.service.RefereeService;
+import pt.ul.fc.css.soccernow.services.RefereeService;
 
 @RestController
 @RequestMapping("/api/referees")

@@ -12,8 +12,8 @@ import pt.ul.fc.css.soccernow.dto.PlayerRegistrationDTO;
 import pt.ul.fc.css.soccernow.dto.RefereeRegistrationDTO;
 import pt.ul.fc.css.soccernow.model.Player;
 import pt.ul.fc.css.soccernow.model.Referee;
-import pt.ul.fc.css.soccernow.service.PlayerService;
-import pt.ul.fc.css.soccernow.service.RefereeService;
+import pt.ul.fc.css.soccernow.services.PlayerService;
+import pt.ul.fc.css.soccernow.services.RefereeService;
 
 @RestController
 @RequestMapping("/api/auth")
