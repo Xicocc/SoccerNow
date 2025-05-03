@@ -30,6 +30,10 @@ public class PlayerService {
     return playerRepository.save(player);
   }
 
+  public List<Player> getAllPlayers() {
+    return playerRepository.findAllPlayers();
+  }
+
   public Double getAverageGoals(String playerName) {
     Double avg = playerRepository.findAverageGoalsPerGameByName(playerName);
     return avg != null ? avg : 0.0;
@@ -55,6 +59,54 @@ public class PlayerService {
     }
 
     player.setGoalsScored(player.getGoalsScored() + goals);
+
+    return playerRepository.save(player);
+  }
+
+  public Player addYellowCards(Long playerId, int ycards) {
+    Player player =
+        (Player)
+            playerRepository
+                .findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+    if (ycards < 0) {
+      throw new IllegalArgumentException("Cards cannot be negative");
+    }
+
+    player.setYellowCards(player.getYellowCards() + ycards);
+
+    return playerRepository.save(player);
+  }
+
+  public Player addRedCards(Long playerId, int rcards) {
+    Player player =
+        (Player)
+            playerRepository
+                .findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+    if (rcards < 0) {
+      throw new IllegalArgumentException("Cards cannot be negative");
+    }
+
+    player.setRedCards(player.getRedCards() + rcards);
+
+    return playerRepository.save(player);
+  }
+
+  public Player addGamesPlayed(Long playerId, int games) {
+    Player player =
+        (Player)
+            playerRepository
+                .findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+    if (games < 0) {
+      throw new IllegalArgumentException("Games cannot be negative");
+    }
+
+    player.setGamesPlayed(player.getGamesPlayed() + games);
 
     return playerRepository.save(player);
   }

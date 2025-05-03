@@ -8,7 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pt.ul.fc.css.soccernow.exceptions.PlayerNotFoundException;
+import pt.ul.fc.css.soccernow.exceptions.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +38,14 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(PlayerNotFoundException.class)
   public Map<String, String> handlePlayerNotFound(PlayerNotFoundException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", ex.getMessage());
+    return error;
+  }
+
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(RefereeNotFoundException.class)
+  public Map<String, String> handleRefereeNotFound(RefereeNotFoundException ex) {
     Map<String, String> error = new HashMap<>();
     error.put("error", ex.getMessage());
     return error;

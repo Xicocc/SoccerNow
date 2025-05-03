@@ -1,5 +1,6 @@
 package pt.ul.fc.css.soccernow.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.model.User;
 import pt.ul.fc.css.soccernow.repository.UserRepository;
@@ -10,6 +11,10 @@ public class UserService {
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  public List<User> getAllUsers() {
+    return userRepository.findAllUsers();
   }
 
   public User getUserByName(String name) {

@@ -1,0 +1,263 @@
+@startuml SoccerNow_Complete_Class_Diagram
+
+skinparam class {
+    BackgroundColor<<Entity>> #F5F5F5
+    BackgroundColor<<DTO>> #E3F2FD
+    BackgroundColor<<Service>> #E8F5E9
+    BackgroundColor<<Controller>> #FFEBEE
+    BackgroundColor<<Repository>> #FFF3E0
+    BorderColor #444
+    ArrowColor #444
+}
+
+' ====== ENUMS ======
+enum Position {
+    GOALKEEPER
+    SWEEPER
+    RIGHT_WINGER
+    LEFT_WINGER
+    FORWARD
+    UNKNOWN
+}
+
+' ====== CORE ENTITIES ======
+abstract class User <<Entity>> {
+    - id: Long <<GeneratedValue>>
+    - name: String <<NotNull>>
+    - age: Integer
+    --
+    + User()
+    + User(name: String, age: Integer)
+    + getId(): Long
+    + getName(): String
+    + setName(name: String): void
+    + getAge(): Integer
+    + setAge(age: Integer): void
+}
+
+class Player <<Entity>> {
+    - gamesPlayed: int = 0
+    - goalsScored: int = 0
+    - yellowCards: int = 0
+    - redCards: int = 0
+    - preferredPosition: Position <<Enumerated>>
+    --
+    + Player()
+    + Player(name: String, age: Integer, position: Position)
+    + getGamesPlayed(): int
+    + setGamesPlayed(games: int): void
+    + getGoalsScored(): int
+    + setGoalsScored(goals: int): void
+    + getYellowCards(): int
+    + setYellowCards(cards: int): void
+    + getRedCards(): int
+    + setRedCards(cards: int): void
+    + getPreferredPosition(): Position
+    + setPreferredPosition(pos: Position): void
+}
+
+class Referee <<Entity>> {
+    - gamesParticipated: int = 0
+    --
+    + Referee()
+    + Referee(name: String, age: Integer)
+    + getGamesParticipated(): int
+    + setGamesParticipated(games: int): void
+}
+
+interface UserRepository <<Repository>> {
+    + findByName(name: String): User
+    + findAllUsers(): List<User>
+    __
+    <<JpaRepository<User, Long>>>
+    Inherits all JpaRepository methods
+}
+
+interface PlayerRepository <<Repository>> {
+    + findAllPlayers(): List<Player>
+    + findByPosition(position: Position): List<Player>
+    + findAverageGoalsPerGameByName(name: String): Double
+    + findPlayersByMostRedCards(): List<Player>
+    + findTopPlayersByRedCards(limit: int): List<Player>
+    __
+    <<Extends UserRepository>>
+}
+
+interface RefereeRepository <<Repository>> {
+    + findAllReferees(): List<Referee>
+    + findTopRefereeByGamesParticipated(): Referee
+    __
+    <<Extends UserRepository>>
+}
+
+' ====== SERVICES ======
+class UserService <<Service>> {
+    - userRepository: UserRepository
+    __
+    + getAllUsers(): List<User>
+    + getUserByName(name: String): User
+    + existsByName(name: String): boolean
+    __
+    <<@Service>>
+}
+
+class PlayerService <<Service>> {
+    - playerRepository: PlayerRepository
+    - userService: UserService
+    __
+    + registerPlayer(dto: PlayerRegistrationDTO): Player
+    + getAllPlayers(): List<Player>
+    + getAverageGoals(playerName: String): Double
+    + getPlayersByPosition(position: Position): List<Player>
+    + getPlayersWithMostRedCards(): List<Player>
+    + addGoals(playerId: Long, goals: int): Player
+    + addYellowCards(playerId: Long, ycards: int): Player
+    + addRedCards(playerId: Long, rcards: int): Player
+    + addGamesPlayed(playerId: Long, games: int): Player
+    __
+    <<@Service>>
+    Throws:
+    - IllegalArgumentException
+    - PlayerNotFoundException
+}
+
+class RefereeService <<Service>> {
+    - refereeRepository: RefereeRepository
+    - userService: UserService
+    __
+    + registerReferee(dto: RefereeRegistrationDTO): Referee
+    + getAllReferees(): List<Referee>
+    + getTopReferee(): Referee
+    + addGamesParticipated(refereeId: Long, games: int): Referee
+    __
+    <<@Service>>
+    Throws:
+    - IllegalArgumentException
+    - RefereeNotFoundException
+}
+
+' ====== CONTROLLERS ======
+class PlayerController <<Controller>> {
+    - playerService: PlayerService
+    __
+    + getAllPlayers(): ResponseEntity<List<Player>>
+    + getAverageGoals(name: String): ResponseEntity<Double>
+    + getPlayersByPosition(position: Position): ResponseEntity<List<Player>>
+    + getPlayersWithMostRedCards(): ResponseEntity<List<Player>>
+    + addGoals(id: Long, goals: int): ResponseEntity<Player>
+    + addGamesPlayed(id: Long, games: int): ResponseEntity<Player>
+    + addYellowCards(id: Long, ycards: int): ResponseEntity<Player>
+    + addRedCards(id: Long, rcards: int): ResponseEntity<Player>
+    __
+    <<@RestController>>
+    <<@RequestMapping("/api/players")>>
+}
+
+class RefereeController <<Controller>> {
+    - refereeService: RefereeService
+    __
+    + getAllReferees(): ResponseEntity<List<Referee>>
+    + getTopReferee(): Referee
+    + addGamesParticipated(id: Long, games: int): ResponseEntity<Referee>
+    __
+    <<@RestController>>
+    <<@RequestMapping("/api/referees")>>
+}
+
+class UserController <<Controller>> {
+    - userService: UserService
+    __
+    + getAllUsers(): ResponseEntity<List<UserDTO>>
+    __
+    <<@RestController>>
+    <<@RequestMapping("/api/users")>>
+}
+
+class RegistrationController <<Controller>> {
+    - playerService: PlayerService
+    - refereeService: RefereeService
+    __
+    + registerPlayer(dto: PlayerRegistrationDTO): ResponseEntity<Player>
+    + registerReferee(dto: RefereeRegistrationDTO): ResponseEntity<Referee>
+    __
+    <<@RestController>>
+    <<@RequestMapping("/api/auth")>>
+}
+
+' ====== DTOs ======
+class PlayerRegistrationDTO <<DTO>> {
+    - name: String
+    - age: Integer
+    - preferredPosition: Position
+    __
+    <<Record>>
+    Validation:
+    - @NotBlank name
+    - @Min(16) age
+    - @NotNull position
+}
+
+class RefereeRegistrationDTO <<DTO>> {
+    - name: String
+    - age: Integer
+    __
+    <<Record>>
+    Validation:
+    - @NotBlank name
+    - @Min(18) age
+}
+
+class UserDTO <<DTO>> {
+    - id: Long
+    - name: String
+    - age: Integer
+    - userType: String
+    __
+    <<Record>>
+    Static factory:
+    + fromUser(user: User): UserDTO
+}
+
+
+' ====== INHERITANCE ======
+User <|-- Player
+User <|-- Referee
+
+' ====== COMPOSITION/AGGREGATION ======
+Player --> Position
+
+PlayerController --> PlayerService
+PlayerService --> PlayerRepository
+PlayerRepository --> Player
+
+RefereeController --> RefereeService
+RefereeService --> RefereeRepository
+RefereeRepository --> Referee
+
+RegistrationController --> PlayerService
+RegistrationController --> RefereeService
+
+' ====== DEPENDENCIES ======
+PlayerService ..> PlayerRegistrationDTO
+RefereeService ..> RefereeRegistrationDTO
+UserService ..> UserDTO
+
+note top of User: Base class for all users\nContains common fields
+note bottom of Player: Extends User\nTracks player-specific stats
+note bottom of Referee: Extends User\nTracks referee-specific data
+' ====== QUERY ANNOTATIONS ======
+note top of PlayerRepository
+  <<@Repository>>
+  Custom JPQL queries:
+  - Position filtering
+  - Goals average calculation
+  - Red cards ranking
+end note
+
+note bottom of RefereeRepository
+  <<@Repository>>
+  Custom JPQL queries:
+  - Top referee by participation
+end note
+
+@enduml

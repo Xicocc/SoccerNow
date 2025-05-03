@@ -8,6 +8,10 @@ import pt.ul.fc.css.soccernow.model.Position;
 
 @Repository
 public interface PlayerRepository extends UserRepository {
+
+  @Query("SELECT p FROM Player p")
+  List<Player> findAllPlayers();
+
   @Query("SELECT p FROM Player p WHERE p.preferredPosition = :position")
   List<Player> findByPosition(Position position);
 

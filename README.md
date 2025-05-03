@@ -1,23 +1,24 @@
 # SoccerNow: Gestão de Jogos de Futsal
 
-# Esse ficheiro deve ser rescrito com base nas informações descritas no enunciado do projeto.
-
+# Alunos:.
+ - Martim Neto 56279
+ - Francisco Carvalho 52838
 ---
 
-**Projeto Prático #1:**  
- - O projeto deve ser desenvolvido por grupos de **no máximo três alunos**.  
+**Projeto Prático #1:**
+ - O projeto deve ser desenvolvido por grupos de **no máximo três alunos**.
  - Devem identificar no ficheiro `Readme.md` os integrantes do grupo, o número, e quais são os conjuntos de casos de uso que cada um dos alunos ira resolver.
 
- **Plágio:**  
- - Além de inspeção manual, será utilizado um software de deteção de plágio no código-fonte do projeto.  
+ **Plágio:**
+ - Além de inspeção manual, será utilizado um software de deteção de plágio no código-fonte do projeto.
  - **Todos** os alunos que submeterem código obtido através de plágio terão os seus projetos anulados.
 
- **Uso de Inteligência Artificial:**  
- - É permitido utilizar ferramentas de IA como ChatGPT, Copilot, DeepSeek e similares.  
+ **Uso de Inteligência Artificial:**
+ - É permitido utilizar ferramentas de IA como ChatGPT, Copilot, DeepSeek e similares.
  - Contudo, todos os membros do grupo devem ser capazes de **compreender e explicar** o projeto **na sua totalidade** aos docentes quando solicitado.  Se houver código que o grupo não consiga explicar, o projeto será considerado como **plágio**.
 
-**Submissão:**  
- - A data de submissão do projeto é **01/05/2025** às 23:59.  
+**Submissão:**
+ - A data de submissão do projeto é **01/05/2025** às 23:59.
  - A descrição do processo de submissão encontra-se no enunciado.
 
 ---
@@ -86,7 +87,7 @@ Correr numa bash (tanto a Git Bash, MSys2 bash ou WSL em linux) e não na Powers
 
 ## Estou em windows, tenho o python instalado mas ao correr o `bash setup.sh` ele não encontra o pip
 
-Deve adicionar o pip ao PATH. Procure em `C:\Users\<vosso_user>\AppData\Local\Programs\Python\<versao_do_python>\Scripts`. 
+Deve adicionar o pip ao PATH. Procure em `C:\Users\<vosso_user>\AppData\Local\Programs\Python\<versao_do_python>\Scripts`.
 Atenção pois essa pasta potencialmente estará oculta.
 
 
@@ -97,4 +98,3 @@ Atenção pois essa pasta potencialmente estará oculta.
 ## Ao executar o `bash run.sh` tenho um erro 401 e não consigo descarregar as imagens
 
 Deve no terminal fazer logout do docker `docker logout` e refazer o login `docker login`.
-
