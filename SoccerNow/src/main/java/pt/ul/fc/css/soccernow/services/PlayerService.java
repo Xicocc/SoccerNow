@@ -110,4 +110,17 @@ public class PlayerService {
 
     return playerRepository.save(player);
   }
+
+  public Player getPlayerByName(String name) {
+    Player player = playerRepository.findByName(name);
+    if (player == null) {
+      throw new PlayerNotFoundException(name);
+    }
+    return player;
+  }
+
+  public Player getPlayerById(Long id) {
+    return (Player)
+        playerRepository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
+  }
 }

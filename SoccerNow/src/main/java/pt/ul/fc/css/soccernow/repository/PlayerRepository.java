@@ -9,6 +9,8 @@ import pt.ul.fc.css.soccernow.model.Position;
 @Repository
 public interface PlayerRepository extends UserRepository {
 
+  Player findByName(String name);
+
   @Query("SELECT p FROM Player p")
   List<Player> findAllPlayers();
 

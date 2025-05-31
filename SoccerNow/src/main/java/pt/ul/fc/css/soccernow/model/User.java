@@ -14,11 +14,15 @@ public abstract class User {
   @Column(nullable = false)
   private String name;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "user_type")
+  private UserType userType;
+
   private Integer age;
 
   public User() {}
 
-  public User(String name, Integer age) {
+  public User(String name, Integer age, UserType userType) {
     this.name = name;
     this.age = age;
   }

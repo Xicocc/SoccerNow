@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.ul.fc.css.soccernow.dto.TeamRegistrationDTO;
 import pt.ul.fc.css.soccernow.model.Player;
 import pt.ul.fc.css.soccernow.model.Team;
+import pt.ul.fc.css.soccernow.services.PlayerService;
 import pt.ul.fc.css.soccernow.services.TeamService;
 
 @RestController
@@ -18,9 +19,11 @@ import pt.ul.fc.css.soccernow.services.TeamService;
 @Tag(name = "Team", description = "Team management endpoints")
 public class TeamController {
   private final TeamService teamService;
+  private final PlayerService playerService;
 
-  public TeamController(TeamService teamService) {
+  public TeamController(TeamService teamService, PlayerService playerService) {
     this.teamService = teamService;
+    this.playerService = playerService;
   }
 
   @Operation(summary = "Register a new team")
@@ -97,10 +100,16 @@ public class TeamController {
         @ApiResponse(responseCode = "404", description = "Team not found")
       })
   @PatchMapping("/{teamId}/players/{playerId}")
-  public ResponseEntity<Team> addPlayerToTeam(
+  public ResponseEntity<String> addPlayerToTeam(
       @Parameter(description = "ID of the team") @PathVariable Long teamId,
       @Parameter(description = "ID of the player") @PathVariable Long playerId) {
-    return ResponseEntity.ok(teamService.addPlayerToTeam(teamId, playerId));
+    Team team = teamService.getTeamById(teamId);
+    Player player = playerService.getPlayerById(playerId);
+    if (team.getPlayers().contains(player)) {
+      return ResponseEntity.badRequest().body("Player is already in the team");
+    }
+    teamService.addPlayerToTeam(teamId, playerId);
+    return ResponseEntity.ok("Player added successfully");
   }
 
   @Operation(summary = "Remove player from team")
@@ -139,5 +148,18 @@ public class TeamController {
   public ResponseEntity<List<Team>> getTeamsWithPlayer(
       @Parameter(description = "ID of the player") @PathVariable Long playerId) {
     return ResponseEntity.ok(teamService.getTeamsWithPlayer(playerId));
+  }
+
+  @Operation(summary = "Remove a team")
+  @DeleteMapping("/{id}/{name}")
+  public ResponseEntity<String> removeTeam(
+      @Parameter(description = "ID of the team") @PathVariable Long id,
+      @Parameter(description = "Team's name") @PathVariable String name) {
+    Team team = teamService.getTeamById(id);
+    if (!team.getName().equals(name)) {
+      return ResponseEntity.badRequest().body("Invalid team name");
+    }
+    teamService.removeTeam(id);
+    return ResponseEntity.ok("Team removed successfully");
   }
 }

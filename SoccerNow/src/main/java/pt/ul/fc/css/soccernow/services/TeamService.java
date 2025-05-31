@@ -154,4 +154,9 @@ public class TeamService {
   public List<Team> getTeamsWithPlayerName(String playerName) {
     return teamRepository.findByPlayerName(playerName);
   }
+
+  public void removeTeam(Long teamId) {
+    Team team = getTeamById(teamId);
+    teamRepository.delete(team);
+  }
 }

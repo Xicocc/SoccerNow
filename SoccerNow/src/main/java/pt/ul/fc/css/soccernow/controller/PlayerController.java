@@ -111,4 +111,16 @@ public class PlayerController {
       @Parameter(description = "Number of goals to add") @RequestParam int rcards) {
     return ResponseEntity.ok(playerService.addRedCards(id, rcards));
   }
+
+  @Operation(summary = "Get player by name")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Player found"),
+        @ApiResponse(responseCode = "404", description = "Player not found")
+      })
+  @GetMapping("/by-name")
+  public ResponseEntity<Player> getPlayerByName(
+      @Parameter(description = "Name of the player") @RequestParam String name) {
+    return ResponseEntity.ok(playerService.getPlayerByName(name));
+  }
 }
