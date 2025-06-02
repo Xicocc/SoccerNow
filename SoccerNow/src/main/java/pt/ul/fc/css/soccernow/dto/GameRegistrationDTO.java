@@ -2,6 +2,7 @@ package pt.ul.fc.css.soccernow.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 public class GameRegistrationDTO {
@@ -17,14 +18,22 @@ public class GameRegistrationDTO {
 
   private String location;
 
+  @Positive(message = "Championship ID must be a positive number")
+  private Long championshipId;
+
   public GameRegistrationDTO() {}
 
   public GameRegistrationDTO(
-      String homeTeamName, String awayTeamName, LocalDateTime gameTime, String location) {
+      String homeTeamName,
+      String awayTeamName,
+      LocalDateTime gameTime,
+      String location,
+      Long championshipId) {
     this.homeTeamName = homeTeamName;
     this.awayTeamName = awayTeamName;
     this.gameTime = gameTime;
     this.location = location;
+    this.championshipId = championshipId;
   }
 
   public String getHomeTeamName() {
@@ -57,5 +66,13 @@ public class GameRegistrationDTO {
 
   public void setLocation(String location) {
     this.location = location;
+  }
+
+  public Long getChampionshipId() {
+    return championshipId;
+  }
+
+  public void setChampionshipId(Long championshipId) {
+    this.championshipId = championshipId;
   }
 }

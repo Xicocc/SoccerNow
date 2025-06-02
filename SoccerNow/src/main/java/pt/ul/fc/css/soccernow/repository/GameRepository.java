@@ -31,4 +31,24 @@ public interface GameRepository extends JpaRepository<Game, Long> {
   // Get all cancelled games
   @Query("SELECT g FROM Game g WHERE g.status = pt.ul.fc.css.soccernow.model.GameStatus.CANCELLED")
   List<Game> findCancelledGames();
+
+  // Find games by championship
+  @Query("SELECT g FROM Game g WHERE g.championship.id = :championshipId")
+  List<Game> findByChampionshipId(Long championshipId);
+
+  // Find standalone games (not part of any championship)
+  @Query("SELECT g FROM Game g WHERE g.championship IS NULL")
+  List<Game> findStandaloneGames();
+
+  // Find games by team and championship
+  @Query(
+      "SELECT g FROM Game g WHERE (g.homeTeam.id = :teamId OR g.awayTeam.id = :teamId) "
+          + "AND g.championship.id = :championshipId")
+  List<Game> findByTeamAndChampionship(Long teamId, Long championshipId);
+
+  // Find scheduled games for a specific championship
+  @Query(
+      "SELECT g FROM Game g WHERE g.championship.id = :championshipId "
+          + "AND g.status = pt.ul.fc.css.soccernow.model.GameStatus.SCHEDULED")
+  List<Game> findScheduledGamesByChampionship(Long championshipId);
 }

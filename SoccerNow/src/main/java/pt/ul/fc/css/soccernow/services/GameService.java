@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.GameRegistrationDTO;
+import pt.ul.fc.css.soccernow.exceptions.ChampionshipNotFoundException;
 import pt.ul.fc.css.soccernow.exceptions.GameNotFoundException;
 import pt.ul.fc.css.soccernow.exceptions.TeamNotFoundException;
+import pt.ul.fc.css.soccernow.model.Championship;
 import pt.ul.fc.css.soccernow.model.Game;
 import pt.ul.fc.css.soccernow.model.GameStatus;
 import pt.ul.fc.css.soccernow.model.Team;
+import pt.ul.fc.css.soccernow.repository.ChampionshipRepository;
 import pt.ul.fc.css.soccernow.repository.GameRepository;
 import pt.ul.fc.css.soccernow.repository.TeamRepository;
 
@@ -17,35 +20,38 @@ public class GameService {
 
   private final GameRepository gameRepository;
   private final TeamRepository teamRepository;
+  private final ChampionshipRepository championshipRepository;
 
-  public GameService(GameRepository gameRepository, TeamRepository teamRepository) {
+  public GameService(
+      GameRepository gameRepository,
+      TeamRepository teamRepository,
+      ChampionshipRepository championshipRepository) {
     this.gameRepository = gameRepository;
     this.teamRepository = teamRepository;
+    this.championshipRepository = championshipRepository;
   }
 
-  // Register a new game
+  // Register a new game (can be with or without championship)
   public Game registerGame(GameRegistrationDTO dto) {
-    if (dto == null || dto.getHomeTeamName() == null || dto.getAwayTeamName() == null) {
-      throw new IllegalArgumentException("Both team names must be provided");
-    }
+    validateGameDTO(dto);
 
-    Team homeTeam =
-        teamRepository
-            .findByName(dto.getHomeTeamName())
-            .orElseThrow(() -> new TeamNotFoundException(dto.getHomeTeamName()));
+    Team homeTeam = getTeamByName(dto.getHomeTeamName());
+    Team awayTeam = getTeamByName(dto.getAwayTeamName());
 
-    Team awayTeam =
-        teamRepository
-            .findByName(dto.getAwayTeamName())
-            .orElseThrow(() -> new TeamNotFoundException(dto.getAwayTeamName()));
-
-    if (homeTeam.equals(awayTeam)) {
-      throw new IllegalArgumentException("A team cannot play against itself");
-    }
+    validateTeams(homeTeam, awayTeam);
 
     LocalDateTime gameTime = dto.getGameTime() != null ? dto.getGameTime() : LocalDateTime.now();
-
     Game game = new Game(homeTeam, awayTeam, gameTime, dto.getLocation());
+
+    // Set championship if provided
+    if (dto.getChampionshipId() != null) {
+      Championship championship =
+          championshipRepository
+              .findById(dto.getChampionshipId())
+              .orElseThrow(() -> new ChampionshipNotFoundException(dto.getChampionshipId()));
+      game.setChampionship(championship);
+    }
+
     return gameRepository.save(game);
   }
 
@@ -55,6 +61,19 @@ public class GameService {
       throw new IllegalArgumentException("Team name cannot be empty");
     }
     return gameRepository.findByTeamName(teamName.trim());
+  }
+
+  // Get games by championship
+  public List<Game> getGamesByChampionship(Long championshipId) {
+    if (championshipId == null) {
+      throw new IllegalArgumentException("Championship ID cannot be null");
+    }
+    return gameRepository.findByChampionshipId(championshipId);
+  }
+
+  // Get standalone games (not part of any championship)
+  public List<Game> getStandaloneGames() {
+    return gameRepository.findStandaloneGames();
   }
 
   // Update the result of a game
@@ -82,9 +101,13 @@ public class GameService {
     return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
   }
 
-  // Optional: get all scheduled/completed/cancelled games
+  // Get all scheduled/completed/cancelled games
   public List<Game> getScheduledGames() {
     return gameRepository.findScheduledGames();
+  }
+
+  public List<Game> getScheduledGamesByChampionship(Long championshipId) {
+    return gameRepository.findScheduledGamesByChampionship(championshipId);
   }
 
   public List<Game> getCompletedGames() {
@@ -97,5 +120,24 @@ public class GameService {
 
   public List<Game> getAllGames() {
     return gameRepository.findAll();
+  }
+
+  // Helper methods
+  private void validateGameDTO(GameRegistrationDTO dto) {
+    if (dto == null || dto.getHomeTeamName() == null || dto.getAwayTeamName() == null) {
+      throw new IllegalArgumentException("Both team names must be provided");
+    }
+  }
+
+  private Team getTeamByName(String teamName) {
+    return teamRepository
+        .findByName(teamName)
+        .orElseThrow(() -> new TeamNotFoundException(teamName));
+  }
+
+  private void validateTeams(Team homeTeam, Team awayTeam) {
+    if (homeTeam.equals(awayTeam)) {
+      throw new IllegalArgumentException("A team cannot play against itself");
+    }
   }
 }
