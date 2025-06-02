@@ -34,6 +34,10 @@ public class Game {
   @Column(name = "status", nullable = false)
   private GameStatus status = GameStatus.SCHEDULED;
 
+  @ManyToOne
+  @JoinColumn(name = "championship_id")
+  private Championship championship;
+
   public Game() {}
 
   public Game(Team homeTeam, Team awayTeam, LocalDateTime gameTime, String location) {
@@ -102,5 +106,18 @@ public class Game {
 
   public void setStatus(GameStatus status) {
     this.status = status;
+  }
+
+  public Championship getChampionship() {
+    return championship;
+  }
+
+  public void setChampionship(Championship championship) {
+    this.championship = championship;
+  }
+
+  // Helper method to check if game is part of a championship
+  public boolean isChampionshipGame() {
+    return championship != null;
   }
 }
