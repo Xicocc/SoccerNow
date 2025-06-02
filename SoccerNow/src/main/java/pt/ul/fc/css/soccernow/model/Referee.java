@@ -9,7 +9,7 @@ public class Referee extends User {
   public Referee() {}
 
   public Referee(String name, Integer age) {
-    super(name, age, UserType.REFEREE);
+    super(name, age);
   }
 
   public int getGamesParticipated() {

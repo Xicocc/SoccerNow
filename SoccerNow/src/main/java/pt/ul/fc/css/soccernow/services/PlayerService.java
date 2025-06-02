@@ -6,6 +6,7 @@ import pt.ul.fc.css.soccernow.dto.PlayerRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.PlayerNotFoundException;
 import pt.ul.fc.css.soccernow.model.Player;
 import pt.ul.fc.css.soccernow.model.Position;
+import pt.ul.fc.css.soccernow.model.UserType;
 import pt.ul.fc.css.soccernow.repository.PlayerRepository;
 
 @Service
@@ -27,6 +28,7 @@ public class PlayerService {
     player.setName(dto.getName());
     player.setAge(dto.getAge());
     player.setPreferredPosition(dto.getPreferredPosition());
+    player.setUserType(UserType.PLAYER);
     return playerRepository.save(player);
   }
 
@@ -69,6 +71,10 @@ public class PlayerService {
             playerRepository
                 .findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+    if (player.getUserType() != UserType.PLAYER) {
+      throw new IllegalArgumentException("Only players can have yellow cards");
+    }
 
     if (ycards < 0) {
       throw new IllegalArgumentException("Cards cannot be negative");

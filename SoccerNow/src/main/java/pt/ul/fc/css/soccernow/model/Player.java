@@ -23,7 +23,7 @@ public class Player extends User {
   public Player() {}
 
   public Player(String name, Integer age, Position preferredPosition) {
-    super(name, age, UserType.PLAYER);
+    super(name, age);
     this.preferredPosition = preferredPosition;
   }
 

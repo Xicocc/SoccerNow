@@ -22,7 +22,7 @@ public abstract class User {
 
   public User() {}
 
-  public User(String name, Integer age, UserType userType) {
+  public User(String name, Integer age) {
     this.name = name;
     this.age = age;
   }
@@ -45,5 +45,13 @@ public abstract class User {
 
   public void setAge(Integer age) {
     this.age = age;
+  }
+
+  public UserType getUserType() {
+    return userType;
+  }
+
+  public void setUserType(UserType userType) {
+    this.userType = userType;
   }
 }

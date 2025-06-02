@@ -30,6 +30,13 @@ services:
     ports:
       - "8080:8080"
 
+  # soccernowfx:
+  #   build:
+  #     context: ./SoccerNowFX
+  #   container_name: soccernowfx
+  #   depends_on:
+  #     - springbootapp
+
 volumes:
   postgres-data:
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.RefereeRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.RefereeNotFoundException;
 import pt.ul.fc.css.soccernow.model.Referee;
+import pt.ul.fc.css.soccernow.model.UserType;
 import pt.ul.fc.css.soccernow.repository.RefereeRepository;
 
 @Service
@@ -25,6 +26,7 @@ public class RefereeService {
     Referee referee = new Referee();
     referee.setName(dto.getName());
     referee.setAge(dto.getAge());
+    referee.setUserType(UserType.REFEREE);
     return refereeRepository.save(referee);
   }
 

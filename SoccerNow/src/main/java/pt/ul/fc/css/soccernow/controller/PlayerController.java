@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ul.fc.css.soccernow.model.Player;
 import pt.ul.fc.css.soccernow.model.Position;
+import pt.ul.fc.css.soccernow.model.UserType;
 import pt.ul.fc.css.soccernow.services.PlayerService;
 
 @RestController
@@ -57,16 +58,14 @@ public class PlayerController {
   }
 
   @Operation(summary = "Add goals to a player")
-  @ApiResponses(
-      value = {
-        @ApiResponse(responseCode = "200", description = "Goals added successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        @ApiResponse(responseCode = "404", description = "Player not found")
-      })
   @PatchMapping("/{id}/goals")
   public ResponseEntity<Player> addGoals(
       @Parameter(description = "ID of the player") @PathVariable Long id,
       @Parameter(description = "Number of goals to add") @RequestParam int goals) {
+    Player player = playerService.getPlayerById(id);
+    if (player.getUserType() != UserType.PLAYER) {
+      return ResponseEntity.badRequest().build();
+    }
     return ResponseEntity.ok(playerService.addGoals(id, goals));
   }
 
