@@ -7,11 +7,18 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class SoccerNowFXApp extends Application {
+
   @Override
   public void start(Stage primaryStage) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/fxml/PlayerList.fxml"));
-    primaryStage.setTitle("SoccerNow FX - Players");
-    primaryStage.setScene(new Scene(root, 800, 600));
+    Parent root = FXMLLoader.load(getClass().getResource("/fxml/LoginScreen.fxml"));
+    Scene scene = new Scene(root);
+    primaryStage.setTitle("SoccerNow");
+    primaryStage.setScene(scene);
+
+    // Set minimum size for window
+    primaryStage.setMinWidth(600);
+    primaryStage.setMinHeight(400);
+
     primaryStage.show();
   }
 

@@ -25,9 +25,9 @@
    <bottom>
       <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" text="Add Player" />
-            <Button mnemonicParsing="false" text="Edit Player" />
-            <Button mnemonicParsing="false" text="Delete Player" />
+            <Button fx:id="btnAddPlayer" mnemonicParsing="false" text="Add Player" onAction="#handleAddPlayer" />
+            <Button fx:id="btnEditPlayer" mnemonicParsing="false" text="Edit Player" onAction="#handleEditPlayer" />
+            <Button fx:id="btnDeletePlayer" mnemonicParsing="false" text="Delete Player" onAction="#handleDeletePlayer" />
          </children>
       </HBox>
    </bottom>
