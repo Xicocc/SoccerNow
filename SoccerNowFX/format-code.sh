@@ -9,7 +9,7 @@ if [ ! -f google-java-format-1.25.2-all-deps.jar ]; then
 fi
 cd ..
 
-changed_java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep "\.java$")
+changed_java_files=$(git diff --cached --name-only --diff-filter=ACMR | grep "\.java$" | sed 's|^SoccerNowFX/||')
 if [ -z "$changed_java_files" ]; then
   echo "No Java files staged for formatting."
   exit 0

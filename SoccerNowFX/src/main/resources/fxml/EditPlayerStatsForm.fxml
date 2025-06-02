@@ -7,47 +7,44 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.HBox?>
 
-
-<VBox alignment="CENTER" prefHeight="270.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/23.0.1"
+<VBox alignment="CENTER" prefHeight="352.0" prefWidth="402.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.soccernow.fx.controller.EditPlayerStatsFormController">
-    <children>
-        <Label alignment="TOP_CENTER" text="Edit Player Stats" translateY="-10.0">
-            <font>
-                <Font size="16.0" />
-            </font>
-        </Label>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Label text="Player ID:" />
-            <Label fx:id="lblPlayerId" text="1" style="-fx-font-weight: bold;" />
-        </HBox>
-        <TextField fx:id="txtYellowCards" alignment="CENTER" promptText="Yellow Cards">
+      fx:controller="com.soccernow.fx.controller.EditPlayerStatsFormController"
+      spacing="12">
+   <children>
+      <Label alignment="TOP_CENTER" text="Edit Player Stats" translateY="-5.0">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPlayerId" text="1 - John Doe" alignment="CENTER" style="-fx-font-weight: bold;" />
+        <TextField fx:id="txtGamesPlayed" alignment="CENTER" promptText="Games Played">
             <VBox.margin>
-                <Insets left="20.0" right="20.0" top="5.0" />
-            </VBox.margin>
-        </TextField>
-        <TextField fx:id="txtRedCards" alignment="CENTER" promptText="Red Cards">
-            <VBox.margin>
-                <Insets left="20.0" right="20.0" top="5.0" />
+            <Insets left="30.0" right="30.0" top="8.0"/>
             </VBox.margin>
         </TextField>
         <TextField fx:id="txtGoals" alignment="CENTER" promptText="Goals">
             <VBox.margin>
-                <Insets left="20.0" right="20.0" top="5.0" />
+            <Insets left="30.0" right="30.0" top="8.0"/>
             </VBox.margin>
         </TextField>
-        <TextField fx:id="txtGamesPlayed" alignment="CENTER" promptText="Games Played">
-            <VBox.margin>
-                <Insets left="20.0" right="20.0" top="5.0" />
-            </VBox.margin>
-        </TextField>
-        <ButtonBar prefHeight="40.0" prefWidth="200.0" translateY="10.0">
-            <buttons>
-                <Button fx:id="btnConfirm" mnemonicParsing="false" text="Confirm" onAction="#onConfirm" />
-                <Button fx:id="btnCancel" mnemonicParsing="false" text="Cancel" onAction="#onCancel" />
-            </buttons>
+      <TextField fx:id="txtYellowCards" alignment="CENTER" promptText="Yellow Cards">
+         <VBox.margin>
+            <Insets left="30.0" right="30.0" top="8.0"/>
+         </VBox.margin>
+      </TextField>
+      <TextField fx:id="txtRedCards" alignment="CENTER" promptText="Red Cards">
+         <VBox.margin>
+            <Insets left="30.0" right="30.0" top="8.0"/>
+         </VBox.margin>
+      </TextField>
+        <ButtonBar prefHeight="40.0" prefWidth="300.0" translateY="10.0">
+        <buttons>
+            <Button fx:id="btnConfirm" mnemonicParsing="false" text="Confirm" translateX="-125.0" onAction="#onConfirm" />
+            <Button fx:id="btnCancel" mnemonicParsing="false" text="Cancel" translateX="-125.0" onAction="#onCancel" />
+        </buttons>
         </ButtonBar>
-    </children>
+   </children>
 </VBox>

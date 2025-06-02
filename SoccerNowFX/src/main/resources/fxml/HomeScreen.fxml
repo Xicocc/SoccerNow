@@ -5,19 +5,24 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.soccernow.fx.controller.HomeScreenController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="402.0" minWidth="602.0" prefHeight="402.0" prefWidth="602.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.soccernow.fx.controller.HomeScreenController">
    <children>
-      <Button fx:id="playersButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handlePlayersButton" prefHeight="26.0" prefWidth="64.0" scaleX="2.0" scaleY="2.0" text="Players" translateY="-20.0">
+      <Button fx:id="playersButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handlePlayersButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Players" translateY="-20.0">
          <VBox.margin>
             <Insets top="30.0" />
          </VBox.margin>
       </Button>
-      <Button fx:id="teamsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleTeamsButton" prefHeight="26.0" prefWidth="65.0" scaleX="2.0" scaleY="2.0" text="Teams" translateY="-20.0">
+      <Button fx:id="refereesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRefereesButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Referees" translateY="-20.0">
          <VBox.margin>
             <Insets top="30.0" />
          </VBox.margin>
       </Button>
-      <Button fx:id="matchesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleMatchesButton" prefHeight="26.0" prefWidth="67.0" scaleX="2.0" scaleY="2.0" text="Matches" translateY="-20.0">
+      <Button fx:id="teamsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleTeamsButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Teams" translateY="-20.0">
+         <VBox.margin>
+            <Insets top="30.0" />
+         </VBox.margin>
+      </Button>
+      <Button fx:id="matchesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleMatchesButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Matches" translateY="-20.0">
          <VBox.margin>
             <Insets top="30.0" />
          </VBox.margin>

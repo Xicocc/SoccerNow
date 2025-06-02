@@ -13,9 +13,9 @@
 <VBox alignment="CENTER" prefHeight="202.0" prefWidth="302.0"
       xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.soccernow.fx.controller.AddPlayerFormController">
+      fx:controller="com.soccernow.fx.controller.AddRefereeFormController">
    <children>
-      <Label alignment="TOP_CENTER" text="Add Player" translateY="-15.0">
+      <Label alignment="TOP_CENTER" text="Add Referee" translateY="-15.0">
          <font>
             <Font size="16.0" />
          </font>
@@ -30,11 +30,6 @@
             <Insets left="20.0" right="20.0" top="5.0" />
          </VBox.margin>
       </TextField>
-      <ComboBox fx:id="comboPosition" promptText="Position" translateY="-10.0">
-         <VBox.margin>
-            <Insets left="20.0" right="20.0" top="5.0" />
-         </VBox.margin>
-      </ComboBox>
       <ButtonBar prefHeight="40.0" prefWidth="200.0" translateY="10.0">
          <buttons>
             <Button fx:id="btnConfirm" mnemonicParsing="false" text="Confirm" translateX="-75.0" onAction="#onConfirm" />

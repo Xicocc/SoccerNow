@@ -1,8 +1,10 @@
 package com.soccernow.fx.controller;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -23,13 +25,21 @@ public class EditPlayerStatsFormController {
   private Long playerId;
   private Runnable onStatsUpdated; // Callback to refresh table
 
-  public void setPlayerId(long playerId) {
+  public void setPlayerInfo(long playerId, String playerName) {
     this.playerId = playerId;
-    lblPlayerId.setText(String.valueOf(playerId));
+    lblPlayerId.setText(playerId + " - " + playerName);
   }
 
   public void setOnStatsUpdated(Runnable callback) {
     this.onStatsUpdated = callback;
+  }
+
+  @FXML
+  public void initialize() {
+    Platform.runLater(
+        () -> {
+          btnCancel.requestFocus();
+        });
   }
 
   @FXML
@@ -112,21 +122,21 @@ public class EditPlayerStatsFormController {
         String.format(
             "http://localhost:8080/api/players/%d/%s?%s=%d", id, endpointSuffix, paramName, value);
     try {
-      URI uri = URI.create(endpoint);
-      URL url = uri.toURL();
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("PATCH");
-      conn.setRequestProperty("Accept", "*/*");
-      conn.setDoOutput(true);
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create(endpoint))
+              .method("PATCH", HttpRequest.BodyPublishers.noBody())
+              .header("Accept", "*/*")
+              .build();
 
-      // Backend expects empty body for these endpoints, so nothing to write
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      int responseCode = response.statusCode();
 
-      int responseCode = conn.getResponseCode();
-      conn.disconnect();
       return (responseCode == 200 || responseCode == 204);
     } catch (Exception e) {
       showAlert(
-          Alert.AlertType.ERROR,
+          javafx.scene.control.Alert.AlertType.ERROR,
           "Update Failed",
           "Error updating stat at " + endpointSuffix + ": " + e.getMessage());
       return false;

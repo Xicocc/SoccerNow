@@ -21,6 +21,15 @@ public class HomeScreenController {
   }
 
   @FXML
+  private void handleRefereesButton(ActionEvent event) throws IOException {
+    Parent refereeListRoot = FXMLLoader.load(getClass().getResource("/fxml/RefereeList.fxml"));
+    Scene refereeListScene = new Scene(refereeListRoot);
+
+    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    stage.setScene(refereeListScene);
+  }
+
+  @FXML
   private void handleTeamsButton(ActionEvent event) {
     // TODO: Implement navigation
   }
