@@ -218,6 +218,11 @@ public class PlayerListController {
       com.soccernow.fx.controller.EditPlayerStatsFormController dialogController =
           loader.getController();
       dialogController.setPlayerInfo(selected.getId(), selected.getName());
+      dialogController.setCurrentStats(
+          selected.getGamesPlayed() != null ? selected.getGamesPlayed() : 0,
+          selected.getGoalsScored() != null ? selected.getGoalsScored() : 0,
+          selected.getYellowCards() != null ? selected.getYellowCards() : 0,
+          selected.getRedCards() != null ? selected.getRedCards() : 0);
       dialogController.setOnStatsUpdated(this::fetchPlayersFromBackend);
 
       javafx.stage.Stage dialogStage = new javafx.stage.Stage();

@@ -143,6 +143,21 @@ public class EditPlayerStatsFormController {
     }
   }
 
+  public void setCurrentStats(
+      Integer gamesPlayed, Integer goals, Integer yellowCards, Integer redCards) {
+    // Clear the field so promptText will show
+    txtGamesPlayed.setText("");
+    txtGoals.setText("");
+    txtYellowCards.setText("");
+    txtRedCards.setText("");
+
+    // Set the placeholder with current value
+    txtGamesPlayed.setPromptText("Games Played: " + (gamesPlayed != null ? gamesPlayed : 0));
+    txtGoals.setPromptText("Goals Scored: " + (goals != null ? goals : 0));
+    txtYellowCards.setPromptText("Yellow Cards: " + (yellowCards != null ? yellowCards : 0));
+    txtRedCards.setPromptText("Red Cards: " + (redCards != null ? redCards : 0));
+  }
+
   private void showAlert(Alert.AlertType type, String title, String msg) {
     javafx.application.Platform.runLater(
         () -> {

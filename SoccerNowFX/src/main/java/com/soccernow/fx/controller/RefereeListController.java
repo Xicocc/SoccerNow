@@ -2,7 +2,7 @@ package com.soccernow.fx.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.soccernow.fx.dto.ReferereeRegistrationDTO;
+import com.soccernow.fx.dto.RefereeRegistrationDTO;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -10,6 +10,9 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -22,24 +25,25 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 public class RefereeListController {
-  @FXML private TableView<ReferereeRegistrationDTO> tableReferees;
-  @FXML private TableColumn<ReferereeRegistrationDTO, Number> colID;
-  @FXML private TableColumn<ReferereeRegistrationDTO, String> colName;
-  @FXML private TableColumn<ReferereeRegistrationDTO, Number> colAge;
-  @FXML private TableColumn<ReferereeRegistrationDTO, Number> colGamesPart;
+  @FXML private TableView<RefereeRegistrationDTO> tableReferees;
+  @FXML private TableColumn<RefereeRegistrationDTO, Number> colID;
+  @FXML private TableColumn<RefereeRegistrationDTO, String> colName;
+  @FXML private TableColumn<RefereeRegistrationDTO, Number> colAge;
+  @FXML private TableColumn<RefereeRegistrationDTO, Number> colGamesPart;
 
   @FXML private Button btnAddReferee;
   @FXML private Button btnEditReferee;
   @FXML private Button btnDeleteReferee;
   @FXML private Button btnBack;
 
-  private final ObservableList<ReferereeRegistrationDTO> RefereeList =
+  private final ObservableList<RefereeRegistrationDTO> RefereeList =
       FXCollections.observableArrayList();
 
   @FXML
@@ -84,8 +88,8 @@ public class RefereeListController {
 
       String json = jsonBuilder.toString();
       Gson gson = new Gson();
-      Type listType = new TypeToken<List<ReferereeRegistrationDTO>>() {}.getType();
-      List<ReferereeRegistrationDTO> referees = gson.fromJson(json, listType);
+      Type listType = new TypeToken<List<RefereeRegistrationDTO>>() {}.getType();
+      List<RefereeRegistrationDTO> referees = gson.fromJson(json, listType);
 
       RefereeList.clear();
       RefereeList.addAll(referees);
@@ -159,7 +163,7 @@ public class RefereeListController {
       if (responseCode == 201 || responseCode == 200) {
         fetchRefereesFromBackend();
 
-        // Show success dialog on JavaFX thread
+        // Show success dialog
         Platform.runLater(
             () -> {
               Alert alert = new Alert(AlertType.INFORMATION);
@@ -186,11 +190,106 @@ public class RefereeListController {
 
   @FXML
   private void handleEditReferee(ActionEvent event) {
-    System.out.println("Edit Referee button clicked");
+    RefereeRegistrationDTO selected = tableReferees.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("No Selection");
+      alert.setHeaderText(null);
+      alert.setContentText("Please select a player to edit.");
+      alert.showAndWait();
+      return;
+    }
+
+    try {
+      javafx.fxml.FXMLLoader loader =
+          new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/EditRefereeStatsForm.fxml"));
+      javafx.scene.Parent root = loader.load();
+
+      com.soccernow.fx.controller.EditRefereeStatsFormController dialogController =
+          loader.getController();
+      dialogController.setRefereeInfo(
+          selected.getId() != null ? selected.getId().longValue() : 0L,
+          selected.getName(),
+          selected.getGamesParticipated() != null
+              ? Long.parseLong(selected.getGamesParticipated())
+              : 0L);
+      dialogController.setOnStatsUpdated(this::fetchRefereesFromBackend);
+
+      javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+      dialogStage.setTitle("Edit Referee Stats");
+      dialogStage.setScene(new javafx.scene.Scene(root));
+      dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+      dialogStage.setResizable(false);
+      dialogStage.showAndWait();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @FXML
-  private void handleDeleteReferee(ActionEvent event) {
-    System.out.println("Delete Referee button clicked");
+  private void handleDeleteReferee() {
+    RefereeRegistrationDTO selected = tableReferees.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("No Selection");
+      alert.setHeaderText(null);
+      alert.setContentText("Please select a referee to delete.");
+      alert.showAndWait();
+      return;
+    }
+    javafx.scene.control.Alert confirmationAlert =
+        new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+    confirmationAlert.setTitle("Confirm Delete");
+    confirmationAlert.setHeaderText(null);
+    confirmationAlert.setContentText(
+        "Are you sure you want to delete referee: "
+            + selected.getName()
+            + " (ID: "
+            + selected.getId()
+            + ")?");
+    confirmationAlert
+        .showAndWait()
+        .ifPresent(
+            response -> {
+              if (response == ButtonType.OK) {
+                int code = sendDeleteReferee(selected.getId());
+                if (code == 200 || code == 204) {
+                  javafx.scene.control.Alert confirmAlert =
+                      new javafx.scene.control.Alert(
+                          javafx.scene.control.Alert.AlertType.INFORMATION);
+                  confirmAlert.setTitle("Referee Deleted");
+                  confirmAlert.setHeaderText(null);
+                  confirmAlert.setContentText("Referee deleted successfully.");
+                  confirmAlert.showAndWait();
+                  fetchRefereesFromBackend();
+                } else {
+                  javafx.scene.control.Alert errorAlert =
+                      new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                  errorAlert.setTitle("Error");
+                  errorAlert.setHeaderText(null);
+                  errorAlert.setContentText("Deletion failed! (Error code: " + code + ")");
+                  errorAlert.showAndWait();
+                }
+              }
+            });
+  }
+
+  private int sendDeleteReferee(Long refereeId) {
+    try {
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create("http://localhost:8080/api/users/" + refereeId))
+              .DELETE()
+              .header("Accept", "*/*")
+              .build();
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      return response.statusCode();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 }

@@ -1,12 +1,12 @@
 package com.soccernow.fx.dto;
 
-public class ReferereeRegistrationDTO {
+public class RefereeRegistrationDTO {
   private Long id;
   private String name;
   private Integer age;
   private String gamesParticipated;
 
-  public ReferereeRegistrationDTO() {}
+  public RefereeRegistrationDTO() {}
 
   // Getters and setters for all fields
 
