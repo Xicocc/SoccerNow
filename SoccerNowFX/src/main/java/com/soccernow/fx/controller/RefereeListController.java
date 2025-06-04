@@ -3,6 +3,7 @@ package com.soccernow.fx.controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.soccernow.fx.dto.RefereeRegistrationDTO;
+import com.soccernow.fx.util.AppWindowManager;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -53,6 +54,9 @@ public class RefereeListController {
     colAge.setCellValueFactory(new PropertyValueFactory<>("age"));
     colGamesPart.setCellValueFactory(new PropertyValueFactory<>("gamesParticipated"));
 
+    // Add this line for proper column scaling
+    tableReferees.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
     tableReferees.setItems(RefereeList);
 
     fetchRefereesFromBackend();
@@ -63,6 +67,11 @@ public class RefereeListController {
     btnEditReferee
         .disableProperty()
         .bind(tableReferees.getSelectionModel().selectedItemProperty().isNull());
+
+    Platform.runLater(
+        () -> {
+          btnBack.requestFocus();
+        });
   }
 
   private void fetchRefereesFromBackend() {
@@ -102,11 +111,15 @@ public class RefereeListController {
   @FXML
   private void handleBack(ActionEvent event) {
     try {
+      Stage stage = (Stage) btnBack.getScene().getWindow();
+      AppWindowManager.persistSize(stage);
+
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HomeScreen.fxml"));
       Parent homeRoot = loader.load();
       Scene homeScene = new Scene(homeRoot);
-      Stage stage = (Stage) btnBack.getScene().getWindow();
       stage.setScene(homeScene);
+      AppWindowManager.applySize(stage);
+      stage.setTitle("Home Screen");
     } catch (Exception e) {
       e.printStackTrace();
     }

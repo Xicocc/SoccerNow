@@ -3,6 +3,7 @@ package com.soccernow.fx.controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.soccernow.fx.dto.PlayerRegistrationDTO;
+import com.soccernow.fx.util.AppWindowManager;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -61,6 +62,9 @@ public class PlayerListController {
     colYellowCards.setCellValueFactory(new PropertyValueFactory<>("yellowCards"));
     colRedCards.setCellValueFactory(new PropertyValueFactory<>("redCards"));
 
+    // Add this line for proper column scaling
+    tablePlayers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
     tablePlayers.setItems(playerList);
 
     fetchPlayersFromBackend();
@@ -71,6 +75,11 @@ public class PlayerListController {
     btnEditPlayer
         .disableProperty()
         .bind(tablePlayers.getSelectionModel().selectedItemProperty().isNull());
+
+    Platform.runLater(
+        () -> {
+          btnBack.requestFocus();
+        });
   }
 
   private void fetchPlayersFromBackend() {
@@ -110,11 +119,17 @@ public class PlayerListController {
   @FXML
   private void handleBack(ActionEvent event) {
     try {
+      Stage stage = (Stage) btnBack.getScene().getWindow();
+
+      AppWindowManager.persistSize(stage);
+
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HomeScreen.fxml"));
       Parent homeRoot = loader.load();
       Scene homeScene = new Scene(homeRoot);
-      Stage stage = (Stage) btnBack.getScene().getWindow();
+
       stage.setScene(homeScene);
+      AppWindowManager.applySize(stage);
+      stage.setTitle("Home Screen");
     } catch (Exception e) {
       e.printStackTrace();
     }

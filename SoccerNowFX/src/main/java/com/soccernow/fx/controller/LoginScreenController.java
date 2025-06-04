@@ -1,5 +1,6 @@
 package com.soccernow.fx.controller;
 
+import com.soccernow.fx.util.AppWindowManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,12 +36,15 @@ public class LoginScreenController implements Initializable {
 
   @FXML
   private void handleLoginButton(ActionEvent event) throws IOException {
-    // If you have authentication logic, add it here
-    // After successful login, switch to HomeScreen
+    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+    AppWindowManager.persistSize(stage);
+
     Parent homeRoot = FXMLLoader.load(getClass().getResource("/fxml/HomeScreen.fxml"));
     Scene homeScene = new Scene(homeRoot);
 
-    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     stage.setScene(homeScene);
+    AppWindowManager.applySize(stage);
+    stage.setTitle("Home Screen");
   }
 }

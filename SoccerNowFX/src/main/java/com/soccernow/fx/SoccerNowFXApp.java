@@ -1,5 +1,6 @@
 package com.soccernow.fx;
 
+import com.soccernow.fx.util.AppWindowManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,10 +15,11 @@ public class SoccerNowFXApp extends Application {
     Scene scene = new Scene(root);
     primaryStage.setTitle("SoccerNow");
     primaryStage.setScene(scene);
+    primaryStage.setMinWidth(602);
+    primaryStage.setMinHeight(430);
 
-    // Set minimum size for window
-    primaryStage.setMinWidth(600);
-    primaryStage.setMinHeight(400);
+    primaryStage.setMaximized(true);
+    AppWindowManager.persistSize(primaryStage);
 
     primaryStage.show();
   }

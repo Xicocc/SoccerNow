@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox   prefHeight="350.0"
+        spacing="12" alignment="CENTER"
+        xmlns="http://javafx.com/javafx/23.0.1"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.soccernow.fx.controller.AddPlayerToTeamController">
+    <Label text="Select player(s) to add to the team:"/>
+    <TableView fx:id="tablePlayers" prefHeight="260.0" prefWidth="320.0">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60.0"/>
+            <TableColumn fx:id="colName" text="Name" prefWidth="198.0"/>
+            <TableColumn fx:id="colAge" text="Age" prefWidth="60.0"/>
+        </columns>
+    </TableView>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Add" fx:id="btnAdd" onAction="#handleAdd"/>
+        <Button text="Cancel" fx:id="btnCancel" onAction="#handleCancel"/>
+    </HBox>
+</VBox>
