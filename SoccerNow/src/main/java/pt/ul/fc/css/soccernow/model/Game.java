@@ -18,6 +18,10 @@ public class Game {
   @JoinColumn(name = "away_team_id", nullable = false)
   private Team awayTeam;
 
+  @ManyToOne
+  @JoinColumn(name = "referee_id")
+  private Referee referee;
+
   @Column(name = "home_score", columnDefinition = "integer default 0")
   private int homeScore = 0;
 
@@ -34,9 +38,8 @@ public class Game {
   @Column(name = "status", nullable = false)
   private GameStatus status = GameStatus.SCHEDULED;
 
-  @ManyToOne
-  @JoinColumn(name = "championship_id")
-  private Championship championship;
+  @Column(name = "championship_id")
+  private Long championshipId = 0L; // 0 means standalone
 
   public Game() {}
 
@@ -66,6 +69,14 @@ public class Game {
 
   public void setAwayTeam(Team awayTeam) {
     this.awayTeam = awayTeam;
+  }
+
+  public Referee getReferee() {
+    return referee;
+  }
+
+  public void setReferee(Referee referee) {
+    this.referee = referee;
   }
 
   public int getHomeScore() {
@@ -108,16 +119,15 @@ public class Game {
     this.status = status;
   }
 
-  public Championship getChampionship() {
-    return championship;
+  public Long getChampionshipId() {
+    return championshipId;
   }
 
-  public void setChampionship(Championship championship) {
-    this.championship = championship;
+  public void setChampionshipId(Long championshipId) {
+    this.championshipId = championshipId;
   }
 
-  // Helper method to check if game is part of a championship
   public boolean isChampionshipGame() {
-    return championship != null;
+    return championshipId != null && championshipId > 0;
   }
 }

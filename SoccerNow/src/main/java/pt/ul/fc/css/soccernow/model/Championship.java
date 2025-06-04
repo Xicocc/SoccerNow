@@ -38,9 +38,6 @@ public class Championship {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   private Set<Team> participatingTeams = new HashSet<>();
 
-  @OneToMany(mappedBy = "championship")
-  private Set<Game> games = new HashSet<>();
-
   public Championship() {}
 
   public Championship(String name, LocalDate startDate, String location) {
@@ -50,7 +47,6 @@ public class Championship {
     this.status = ChampionshipStatus.PLANNED;
   }
 
-  // Getters and setters
   public Long getId() {
     return id;
   }
@@ -117,19 +113,5 @@ public class Championship {
 
   public void removeTeam(Team team) {
     this.participatingTeams.remove(team);
-  }
-
-  public Set<Game> getGames() {
-    return games;
-  }
-
-  public void addGame(Game game) {
-    this.games.add(game);
-    game.setChampionship(this);
-  }
-
-  public void removeGame(Game game) {
-    this.games.remove(game);
-    game.setChampionship(null);
   }
 }

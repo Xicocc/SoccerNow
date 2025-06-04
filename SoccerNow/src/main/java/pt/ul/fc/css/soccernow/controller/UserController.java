@@ -30,7 +30,7 @@ public class UserController {
   @Operation(summary = "Delete a user")
   @ApiResponse(responseCode = "200", description = "User deleted successfully")
   @ApiResponse(responseCode = "404", description = "User not found")
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{id}/{name}")
   public ResponseEntity<String> deleteUserById(@PathVariable Long id, @PathVariable String name) {
     User user = userService.getUserByName(name);
     if (user.getId() == id) {

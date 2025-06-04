@@ -18,8 +18,10 @@ public class GameRegistrationDTO {
 
   private String location;
 
-  @Positive(message = "Championship ID must be a positive number")
   private Long championshipId;
+
+  @Positive(message = "Referee ID must be positive")
+  private Long refereeId;
 
   public GameRegistrationDTO() {}
 
@@ -28,12 +30,14 @@ public class GameRegistrationDTO {
       String awayTeamName,
       LocalDateTime gameTime,
       String location,
-      Long championshipId) {
+      Long championshipId,
+      Long refereeId) {
     this.homeTeamName = homeTeamName;
     this.awayTeamName = awayTeamName;
     this.gameTime = gameTime;
     this.location = location;
     this.championshipId = championshipId;
+    this.refereeId = refereeId;
   }
 
   public String getHomeTeamName() {
@@ -74,5 +78,13 @@ public class GameRegistrationDTO {
 
   public void setChampionshipId(Long championshipId) {
     this.championshipId = championshipId;
+  }
+
+  public Long getRefereeId() {
+    return refereeId;
+  }
+
+  public void setRefereeId(Long refereeId) {
+    this.refereeId = refereeId;
   }
 }

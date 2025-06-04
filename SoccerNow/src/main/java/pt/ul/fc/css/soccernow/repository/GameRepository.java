@@ -1,54 +1,30 @@
 package pt.ul.fc.css.soccernow.repository;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import pt.ul.fc.css.soccernow.model.Game;
 
-@Repository
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-  // Find games by exact team name (either home or away)
-  @Query(
-      "SELECT g FROM Game g WHERE LOWER(g.homeTeam.name) = LOWER(:teamName) OR"
-          + " LOWER(g.awayTeam.name) = LOWER(:teamName)")
+  @Query("SELECT g FROM Game g WHERE g.homeTeam.name = :teamName OR g.awayTeam.name = :teamName")
   List<Game> findByTeamName(String teamName);
 
-  // Find game by ID (already provided by JpaRepository, but useful to customize)
-  @Query("SELECT g FROM Game g WHERE g.id = :id")
-  Optional<Game> findById(Long id);
-
-  // Get all scheduled games
-  @Query("SELECT g FROM Game g WHERE g.status = pt.ul.fc.css.soccernow.model.GameStatus.SCHEDULED")
-  List<Game> findScheduledGames();
-
-  // Get all completed games
-  @Query("SELECT g FROM Game g WHERE g.status = pt.ul.fc.css.soccernow.model.GameStatus.COMPLETED")
-  List<Game> findCompletedGames();
-
-  // Get all cancelled games
-  @Query("SELECT g FROM Game g WHERE g.status = pt.ul.fc.css.soccernow.model.GameStatus.CANCELLED")
-  List<Game> findCancelledGames();
-
-  // Find games by championship
-  @Query("SELECT g FROM Game g WHERE g.championship.id = :championshipId")
+  @Query("SELECT g FROM Game g WHERE g.championshipId = :championshipId")
   List<Game> findByChampionshipId(Long championshipId);
 
-  // Find standalone games (not part of any championship)
-  @Query("SELECT g FROM Game g WHERE g.championship IS NULL")
+  @Query("SELECT g FROM Game g WHERE g.championshipId = 0")
   List<Game> findStandaloneGames();
 
-  // Find games by team and championship
-  @Query(
-      "SELECT g FROM Game g WHERE (g.homeTeam.id = :teamId OR g.awayTeam.id = :teamId) "
-          + "AND g.championship.id = :championshipId")
-  List<Game> findByTeamAndChampionship(Long teamId, Long championshipId);
+  @Query("SELECT g FROM Game g WHERE g.status = 'SCHEDULED'")
+  List<Game> findScheduledGames();
 
-  // Find scheduled games for a specific championship
-  @Query(
-      "SELECT g FROM Game g WHERE g.championship.id = :championshipId "
-          + "AND g.status = pt.ul.fc.css.soccernow.model.GameStatus.SCHEDULED")
+  @Query("SELECT g FROM Game g WHERE g.status = 'SCHEDULED' AND g.championshipId = :championshipId")
   List<Game> findScheduledGamesByChampionship(Long championshipId);
+
+  @Query("SELECT g FROM Game g WHERE g.status = 'COMPLETED'")
+  List<Game> findCompletedGames();
+
+  @Query("SELECT g FROM Game g WHERE g.status = 'CANCELLED'")
+  List<Game> findCancelledGames();
 }
