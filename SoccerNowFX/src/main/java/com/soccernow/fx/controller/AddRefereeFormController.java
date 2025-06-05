@@ -36,19 +36,54 @@ public class AddRefereeFormController {
     String name = txtName.getText().trim();
     String ageStr = txtAge.getText().trim();
 
+    // --- Name check ---
+    if (name.isEmpty()) {
+      txtName.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Name");
+      alert.setHeaderText(null);
+      alert.setContentText("Referee name cannot be empty.");
+      alert.showAndWait();
+      return;
+    } else {
+      txtName.setStyle("");
+    }
+
+    // --- Age numeric check ---
     int age = 0;
     try {
       age = Integer.parseInt(ageStr);
-    } catch (Exception e) {
+      txtAge.setStyle("");
+    } catch (NumberFormatException e) {
+      txtAge.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Age");
+      alert.setHeaderText(null);
+      alert.setContentText("Age must be a valid number.");
+      alert.showAndWait();
+      return;
     }
 
-    if (listener != null && !name.isEmpty() && age > 0) {
+    // --- Age minimum check ---
+    if (age < 18) {
+      txtAge.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Age");
+      alert.setHeaderText(null);
+      alert.setContentText("Referee must be at least 18 years old.");
+      alert.showAndWait();
+      return;
+    } else {
+      txtAge.setStyle("");
+    }
+
+    // All checks passed, proceed
+    if (listener != null) {
       listener.onRefereeDataEntered(name, age);
       closeWindow();
-    } else {
-      // Show validation error
-      txtName.setStyle(name.isEmpty() ? "-fx-border-color: red;" : "");
-      txtAge.setStyle((age <= 0) ? "-fx-border-color: red;" : "");
     }
   }
 

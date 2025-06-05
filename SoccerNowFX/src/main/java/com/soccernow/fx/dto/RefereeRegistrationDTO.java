@@ -41,4 +41,9 @@ public class RefereeRegistrationDTO {
   public void setGamesParticipated(String gamesParticipated) {
     this.gamesParticipated = gamesParticipated;
   }
+
+  @Override
+  public String toString() {
+    return name + " (ID:" + id + ")";
+  }
 }

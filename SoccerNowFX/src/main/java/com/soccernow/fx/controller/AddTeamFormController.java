@@ -34,7 +34,21 @@ public class AddTeamFormController {
   private void onConfirm() {
     String name = txtName.getText().trim();
 
-    if (listener != null && !name.isEmpty()) {
+    // --- Name check ---
+    if (name.isEmpty()) {
+      txtName.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Name");
+      alert.setHeaderText(null);
+      alert.setContentText("Team name cannot be empty.");
+      alert.showAndWait();
+      return;
+    } else {
+      txtName.setStyle("");
+    }
+
+    if (listener != null) {
       listener.onTeamDataEntered(name);
       closeWindow();
     } else {

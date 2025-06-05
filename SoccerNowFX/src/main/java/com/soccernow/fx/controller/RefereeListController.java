@@ -267,7 +267,7 @@ public class RefereeListController {
         .ifPresent(
             response -> {
               if (response == ButtonType.OK) {
-                int code = sendDeleteReferee(selected.getId());
+                int code = sendDeleteReferee(selected.getId(), selected.getName());
                 if (code == 200 || code == 204) {
                   javafx.scene.control.Alert confirmAlert =
                       new javafx.scene.control.Alert(
@@ -289,12 +289,12 @@ public class RefereeListController {
             });
   }
 
-  private int sendDeleteReferee(Long refereeId) {
+  private int sendDeleteReferee(Long refereeId, String refereeName) {
     try {
       HttpClient client = HttpClient.newHttpClient();
       HttpRequest request =
           HttpRequest.newBuilder()
-              .uri(URI.create("http://localhost:8080/api/users/" + refereeId))
+              .uri(URI.create("http://localhost:8080/api/users/" + refereeId + "/" + refereeName))
               .DELETE()
               .header("Accept", "*/*")
               .build();

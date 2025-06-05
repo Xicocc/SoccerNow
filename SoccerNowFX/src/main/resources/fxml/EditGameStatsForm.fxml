@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.soccernow.fx.controller.EditGameStatsFormController"
+            prefWidth="380" prefHeight="280"
+            style="-fx-background-color: #fafafa;">
+    <VBox spacing="18.0" AnchorPane.topAnchor="15" AnchorPane.leftAnchor="25" AnchorPane.rightAnchor="25" AnchorPane.bottomAnchor="15">
+        <Label text="Edit Game Stats" alignment="CENTER" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        <HBox spacing="10">
+            <Label text="Game ID:" minWidth="90"/>
+            <Label fx:id="lblGameId" style="-fx-font-size: 14px;"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Home Score:" minWidth="90"/>
+            <TextField fx:id="txtHomeScore" promptText="Enter home team score" maxWidth="80"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Away Score:" minWidth="90"/>
+            <TextField fx:id="txtAwayScore" promptText="Enter away team score" maxWidth="80"/>
+        </HBox>
+        <HBox spacing="18" alignment="CENTER">
+            <Button fx:id="btnConfirm" text="Confirm" onAction="#onConfirm" style="-fx-background-color: #48bb78; -fx-text-fill: white;"/>
+            <Button fx:id="btnCancel" text="Cancel" onAction="#onCancel" style="-fx-background-color: #e53e3e; -fx-text-fill: white;"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

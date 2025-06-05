@@ -16,22 +16,27 @@
       </Label>
       <Button fx:id="playersButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handlePlayersButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Players" translateY="-20.0">
          <VBox.margin>
-            <Insets top="30.0" />
+            <Insets top="20.0" />
          </VBox.margin>
       </Button>
       <Button fx:id="refereesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleRefereesButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Referees" translateY="-20.0">
          <VBox.margin>
-            <Insets top="30.0" />
+            <Insets top="20.0" />
          </VBox.margin>
       </Button>
       <Button fx:id="teamsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleTeamsButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Teams" translateY="-20.0">
          <VBox.margin>
-            <Insets top="30.0" />
+            <Insets top="20.0" />
          </VBox.margin>
       </Button>
-      <Button fx:id="matchesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleMatchesButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Matches" translateY="-20.0">
+      <Button fx:id="gamesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleGamesButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Games" translateY="-20.0">
          <VBox.margin>
-            <Insets top="30.0" />
+            <Insets top="20.0" />
+         </VBox.margin>
+      </Button>
+      <Button fx:id="championshipsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleChampionshipsButton" prefHeight="26.0" prefWidth="128.0" scaleX="2.0" scaleY="2.0" text="Championships" translateY="-20.0">
+         <VBox.margin>
+            <Insets top="20.0" />
          </VBox.margin>
       </Button>
    </children>

@@ -55,7 +55,31 @@ public class HomeScreenController {
   }
 
   @FXML
-  private void handleMatchesButton(ActionEvent event) {
-    // TODO: Implement navigation
+  private void handleGamesButton(ActionEvent event) throws IOException {
+    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+    AppWindowManager.persistSize(stage);
+
+    Parent gamesListRoot = FXMLLoader.load(getClass().getResource("/fxml/GameList.fxml"));
+    Scene gamesListScene = new Scene(gamesListRoot);
+
+    stage.setScene(gamesListScene);
+    AppWindowManager.applySize(stage);
+    stage.setTitle("Games List");
+  }
+
+  @FXML
+  private void handleChampionshipsButton(ActionEvent event) throws IOException {
+    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+    AppWindowManager.persistSize(stage);
+
+    Parent championshipListRoot =
+        FXMLLoader.load(getClass().getResource("/fxml/ChampionshipList.fxml"));
+    Scene championshipListScene = new Scene(championshipListRoot);
+
+    stage.setScene(championshipListScene);
+    AppWindowManager.applySize(stage);
+    stage.setTitle("Championship List");
   }
 }

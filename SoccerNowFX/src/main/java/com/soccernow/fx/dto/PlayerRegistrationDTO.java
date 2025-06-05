@@ -77,4 +77,9 @@ public class PlayerRegistrationDTO {
   public void setRedCards(Integer redCards) {
     this.redCards = redCards;
   }
+
+  @Override
+  public String toString() {
+    return name + " (ID:" + id + ")";
+  }
 }

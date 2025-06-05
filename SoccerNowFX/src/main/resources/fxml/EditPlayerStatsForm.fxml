@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.HBox?>
 
 <VBox alignment="CENTER" prefHeight="352.0" prefWidth="402.0"
       xmlns="http://javafx.com/javafx/23.0.1"
@@ -40,11 +41,9 @@
             <Insets left="30.0" right="30.0" top="8.0"/>
          </VBox.margin>
       </TextField>
-        <ButtonBar prefHeight="40.0" prefWidth="300.0" translateY="10.0">
-        <buttons>
-            <Button fx:id="btnConfirm" mnemonicParsing="false" text="Confirm" translateX="-125.0" onAction="#onConfirm" />
-            <Button fx:id="btnCancel" mnemonicParsing="false" text="Cancel" translateX="-125.0" onAction="#onCancel" />
-        </buttons>
-        </ButtonBar>
+        <HBox spacing="18" alignment="CENTER">
+            <Button fx:id="btnConfirm" text="Confirm" onAction="#onConfirm" style="-fx-background-color: #48bb78; -fx-text-fill: white;"/>
+            <Button fx:id="btnCancel" text="Cancel" onAction="#onCancel" style="-fx-background-color: #e53e3e; -fx-text-fill: white;"/>
+        </HBox>
    </children>
 </VBox>

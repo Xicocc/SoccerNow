@@ -41,4 +41,9 @@ public class TeamRegistrationDTO {
   public void setPlayers(List<PlayerRegistrationDTO> players) {
     this.players = players;
   }
+
+  @Override
+  public String toString() {
+    return name + " (ID:" + id + ")";
+  }
 }

@@ -279,7 +279,7 @@ public class PlayerListController {
         .ifPresent(
             response -> {
               if (response == ButtonType.OK) {
-                int code = sendDeletePlayer(selected.getId());
+                int code = sendDeletePlayer(selected.getId(), selected.getName());
                 if (code == 200 || code == 204) {
                   javafx.scene.control.Alert confirmAlert =
                       new javafx.scene.control.Alert(
@@ -301,12 +301,12 @@ public class PlayerListController {
             });
   }
 
-  private int sendDeletePlayer(Long playerId) {
+  private int sendDeletePlayer(Long playerId, String playerName) {
     try {
       HttpClient client = HttpClient.newHttpClient();
       HttpRequest request =
           HttpRequest.newBuilder()
-              .uri(URI.create("http://localhost:8080/api/users/" + playerId))
+              .uri(URI.create("http://localhost:8080/api/users/" + playerId + "/" + playerName))
               .DELETE()
               .header("Accept", "*/*")
               .build();

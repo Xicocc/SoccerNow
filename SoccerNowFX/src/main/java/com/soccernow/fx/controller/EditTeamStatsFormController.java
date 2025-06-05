@@ -45,7 +45,14 @@ public class EditTeamStatsFormController {
       showAlert(Alert.AlertType.WARNING, "No Input", "Please enter a value.");
       return;
     }
+
     long gamesWon = Long.parseLong(gamesWonText);
+
+    if (gamesWon < 0) {
+      showAlert(Alert.AlertType.WARNING, "Invalid Input", "Games won cannot be negative.");
+      return;
+    }
+
     boolean success = sendPatch(teamId, gamesWon);
     if (success) {
       showAlert(Alert.AlertType.INFORMATION, "Success", "Games won updated!");

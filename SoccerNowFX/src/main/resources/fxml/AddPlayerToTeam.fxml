@@ -16,8 +16,8 @@
             <TableColumn fx:id="colAge" text="Age" prefWidth="60.0"/>
         </columns>
     </TableView>
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Add" fx:id="btnAdd" onAction="#handleAdd"/>
-        <Button text="Cancel" fx:id="btnCancel" onAction="#handleCancel"/>
+    <HBox spacing="18" alignment="CENTER">
+        <Button text="Add" fx:id="btnAdd" onAction="#handleAdd" style="-fx-background-color: #48bb78; -fx-text-fill: white;"/>
+        <Button text="Cancel" fx:id="btnCancel" onAction="#handleCancel" style="-fx-background-color: #e53e3e; -fx-text-fill: white;"/>
     </HBox>
 </VBox>

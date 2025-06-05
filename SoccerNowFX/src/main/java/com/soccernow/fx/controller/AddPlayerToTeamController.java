@@ -87,8 +87,10 @@ public class AddPlayerToTeamController {
       showAlert(
           Alert.AlertType.ERROR,
           "Some Failed",
-          "The following player(s) could not be added (Please unselect them and try again):\n\n"
+          "The following player(s) could not be added, possibly because they're already in the"
+              + " team:\n\n"
               + failed);
+      close();
     }
   }
 

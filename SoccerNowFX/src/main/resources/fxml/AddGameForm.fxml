@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="340.0" prefWidth="340.0"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.soccernow.fx.controller.AddGameFormController"
+      spacing="8">
+    <children>
+        <Label alignment="TOP_CENTER" text="Add Game">
+            <font>
+                <Font size="16.0"/>
+            </font>
+        </Label>
+        <ComboBox fx:id="comboChampionship" promptText="Championship (optional)">
+            <VBox.margin>
+                <Insets left="18.0" right="18.0" top="5.0"/>
+            </VBox.margin>
+        </ComboBox>
+        <ComboBox fx:id="comboTeamA" promptText="Home Team">
+            <VBox.margin>
+                <Insets left="18.0" right="18.0" top="5.0"/>
+            </VBox.margin>
+        </ComboBox>
+        <ComboBox fx:id="comboTeamB" promptText="Away Team">
+            <VBox.margin>
+                <Insets left="18.0" right="18.0" top="5.0"/>
+            </VBox.margin>
+        </ComboBox>
+        <DatePicker fx:id="dateGame" promptText="Date">
+            <VBox.margin>
+                <Insets left="18.0" right="18.0" top="5.0"/>
+            </VBox.margin>
+        </DatePicker>
+        <ComboBox fx:id="comboReferee" promptText="Referee">
+            <VBox.margin>
+                <Insets left="18.0" right="18.0" top="5.0"/>
+            </VBox.margin>
+        </ComboBox>
+        <HBox alignment="CENTER" spacing="18">
+            <children>
+                <Button fx:id="btnConfirm" mnemonicParsing="false" text="Confirm" onAction="#onConfirm" style="-fx-background-color: #48bb78; -fx-text-fill: white;"/>
+                <Button fx:id="btnCancel" mnemonicParsing="false" text="Cancel" onAction="#onCancel" style="-fx-background-color: #e53e3e; -fx-text-fill: white;"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>

@@ -45,21 +45,59 @@ public class AddPlayerFormController {
     String ageStr = txtAge.getText().trim();
     String position = comboPosition.getValue();
 
+    boolean valid = true;
+
+    // --- Name check ---
+    if (name.isEmpty()) {
+      txtName.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Name");
+      alert.setHeaderText(null);
+      alert.setContentText("Player name cannot be empty.");
+      alert.showAndWait();
+      valid = false;
+      return;
+    } else {
+      txtName.setStyle("");
+    }
+
+    // --- Age numeric check ---
     int age = 0;
     try {
       age = Integer.parseInt(ageStr);
-    } catch (Exception e) {
+      txtAge.setStyle("");
+    } catch (NumberFormatException e) {
+      txtAge.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Age");
+      alert.setHeaderText(null);
+      alert.setContentText("Age must be a valid number.");
+      alert.showAndWait();
+      valid = false;
+      return;
     }
 
-    if (listener != null && !name.isEmpty() && age > 0 && position != null && !position.isEmpty()) {
+    // --- Age range check ---
+    if (age < 16) {
+      txtAge.setStyle("-fx-border-color: red;");
+      javafx.scene.control.Alert alert =
+          new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+      alert.setTitle("Invalid Age");
+      alert.setHeaderText(null);
+      alert.setContentText("Player must be at least 16 years old.");
+      alert.showAndWait();
+      valid = false;
+      return;
+    } else {
+      txtAge.setStyle("");
+    }
+
+    // If all checks passed, proceed
+    if (valid && listener != null) {
       listener.onPlayerDataEntered(name, age, position);
       closeWindow();
-    } else {
-      // Show validation error
-      txtName.setStyle(name.isEmpty() ? "-fx-border-color: red;" : "");
-      txtAge.setStyle((age <= 0) ? "-fx-border-color: red;" : "");
-      comboPosition.setStyle(
-          (position == null || position.isEmpty()) ? "-fx-border-color: red;" : "");
     }
   }
 
