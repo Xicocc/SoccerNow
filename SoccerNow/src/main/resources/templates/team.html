@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Teams</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h2 class="text-center">Team List</h2>
+
+  <form method="get" th:action="@{/teams}" class="row g-3 mb-4">
+    <div class="col-md-2">
+      <input type="text" name="name" class="form-control" placeholder="Name" th:value="${name}">
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="numPlayers" class="form-control" placeholder="Players" th:value="${numPlayers}">
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="minWins" class="form-control" placeholder="Wins" th:value="${minWins}">
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="minDraws" class="form-control" placeholder="Draws" th:value="${minDraws}">
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="minLosses" class="form-control" placeholder="Losses" th:value="${minLosses}">
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="minTitles" class="form-control" placeholder="Titles" th:value="${minTitles}">
+    </div>
+    <div class="col-md-4 mt-2">
+      <input type="text" name="missingPosition" class="form-control" placeholder="Missing Position" th:value="${missingPosition}">
+    </div>
+    <div class="col-md-2 mt-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Players</th>
+      <th>Wins</th>
+      <th>Draws</th>
+      <th>Losses</th>
+      <th>Titles</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="team : ${teams}">
+      <td th:text="${team.name}">Team Name</td>
+      <td th:text="${team.players.size()}">Player Count</td>
+      <td th:text="${team.wins}">Wins</td>
+      <td th:text="${team.draws}">Draws</td>
+      <td th:text="${team.losses}">Losses</td>
+      <td th:text="${team.titles}">Titles</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

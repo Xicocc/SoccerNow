@@ -2,6 +2,7 @@ package pt.ul.fc.css.soccernow.services;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.GameRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.ChampionshipNotFoundException;
@@ -186,6 +187,34 @@ public class GameService {
     Game game = getGameById(gameId);
     game.setLocation(location.trim());
     return gameRepository.save(game);
+  }
+
+  public List<Game> filterGames(
+      String teamName, Integer minGoals, String location, String timeOfDay, GameStatus status) {
+    return gameRepository.findAll().stream()
+        .filter(
+            game ->
+                teamName == null
+                    || game.getHomeTeam().getName().toLowerCase().contains(teamName.toLowerCase())
+                    || game.getAwayTeam().getName().toLowerCase().contains(teamName.toLowerCase()))
+        .filter(game -> minGoals == null || (game.getHomeScore() + game.getAwayScore()) >= minGoals)
+        .filter(
+            game ->
+                location == null
+                    || game.getLocation().toLowerCase().contains(location.toLowerCase()))
+        .filter(game -> status == null || game.getStatus() == status)
+        .filter(
+            game -> {
+              if (timeOfDay == null) return true;
+              int hour = game.getGameTime().getHour();
+              return switch (timeOfDay.toLowerCase()) {
+                case "morning" -> hour >= 6 && hour < 12;
+                case "afternoon" -> hour >= 12 && hour < 18;
+                case "evening" -> hour >= 18 || hour < 6;
+                default -> true;
+              };
+            })
+        .collect(Collectors.toList());
   }
 
   // Helpers

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h2 class="text-center">Dashboard</h2>
+  <p class="text-center">You are now logged in.</p>
+
+  <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+    <a class="btn btn-primary" href="/players">Manage Players</a>
+    <a class="btn btn-primary" href="/referees">Manage Referees</a>
+    <a class="btn btn-primary" href="/teams">Manage Teams</a>
+    <a class="btn btn-primary" href="/games">Manage Games</a>
+    <a class="btn btn-primary" href="/championships">Manage Championships</a>
+  </div>
+
+  <div class="text-center mt-4">
+    <a class="btn btn-outline-secondary" href="/logout">Logout</a>
+  </div>
+</div>
+</body>
+</html>
