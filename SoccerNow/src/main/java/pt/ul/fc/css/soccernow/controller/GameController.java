@@ -127,4 +127,80 @@ public class GameController {
   public ResponseEntity<List<Game>> getCancelledGames() {
     return ResponseEntity.ok(gameService.getCancelledGames());
   }
+
+  @Operation(summary = "Get games that have been played")
+  @ApiResponse(responseCode = "200", description = "List of completed games")
+  @GetMapping("/played")
+  public ResponseEntity<List<Game>> getPlayedGames() {
+    return ResponseEntity.ok(gameService.getPlayedGames());
+  }
+
+  @Operation(summary = "Get upcoming (scheduled) games")
+  @ApiResponse(responseCode = "200", description = "List of scheduled games")
+  @GetMapping("/upcoming")
+  public ResponseEntity<List<Game>> getUpcomingGames() {
+    return ResponseEntity.ok(gameService.getUpcomingGames());
+  }
+
+  @Operation(summary = "Get games with a specific total number of goals")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "List of games with given goal total"),
+    @ApiResponse(responseCode = "400", description = "Invalid goal count")
+  })
+  @GetMapping("/by-goals")
+  public ResponseEntity<List<Game>> getGamesByGoals(
+      @Parameter(description = "Total number of goals") @RequestParam int goals) {
+    if (goals < 0) {
+      return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok(gameService.getGamesByTotalGoals(goals));
+  }
+
+  @Operation(summary = "Get games by location")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "List of games in the location"),
+    @ApiResponse(responseCode = "400", description = "Invalid location")
+  })
+  @GetMapping("/by-location")
+  public ResponseEntity<List<Game>> getGamesByLocation(
+      @Parameter(description = "Location name") @RequestParam String location) {
+    if (location == null || location.isBlank()) {
+      return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok(gameService.getGamesByLocation(location.trim()));
+  }
+
+  @Operation(summary = "Get morning games (before 12:00)")
+  @ApiResponse(responseCode = "200", description = "List of morning games")
+  @GetMapping("/morning")
+  public ResponseEntity<List<Game>> getMorningGames() {
+    return ResponseEntity.ok(gameService.getMorningGames());
+  }
+
+  @Operation(summary = "Get afternoon games (12:00–17:59)")
+  @ApiResponse(responseCode = "200", description = "List of afternoon games")
+  @GetMapping("/afternoon")
+  public ResponseEntity<List<Game>> getAfternoonGames() {
+    return ResponseEntity.ok(gameService.getAfternoonGames());
+  }
+
+  @Operation(summary = "Get evening games (18:00 and later)")
+  @ApiResponse(responseCode = "200", description = "List of evening games")
+  @GetMapping("/evening")
+  public ResponseEntity<List<Game>> getEveningGames() {
+    return ResponseEntity.ok(gameService.getEveningGames());
+  }
+
+  @PatchMapping("/{id}/location")
+  @Operation(summary = "Update the location of a game")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Game location updated"),
+    @ApiResponse(responseCode = "400", description = "Invalid location"),
+    @ApiResponse(responseCode = "404", description = "Game not found")
+  })
+  public ResponseEntity<Game> updateGameLocation(
+      @Parameter(description = "ID of the game") @PathVariable Long id,
+      @RequestParam String location) {
+    return ResponseEntity.ok(gameService.updateGameLocation(id, location));
+  }
 }

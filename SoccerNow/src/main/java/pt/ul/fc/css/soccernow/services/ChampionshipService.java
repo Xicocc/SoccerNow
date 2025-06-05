@@ -64,6 +64,21 @@ public class ChampionshipService {
     return championshipRepository.findByParticipatingTeamId(teamId);
   }
 
+  // Get championships by (partial) name
+  public List<Championship> getChampionshipsByName(String name) {
+    return championshipRepository.findByNameContainingIgnoreCase(name);
+  }
+
+  // Get championships by number of games played (FINISHED)
+  public List<Championship> getChampionshipsByGamesPlayed(long playedCount) {
+    return championshipRepository.findByGamesPlayed(playedCount);
+  }
+
+  // Get championships by number of games remaining (not FINISHED)
+  public List<Championship> getChampionshipsByGamesRemaining(long remainingCount) {
+    return championshipRepository.findByGamesRemaining(remainingCount);
+  }
+
   // Update championship status
   public Championship updateStatus(Long id, ChampionshipStatus status) {
     Championship championship = getChampionshipById(id);

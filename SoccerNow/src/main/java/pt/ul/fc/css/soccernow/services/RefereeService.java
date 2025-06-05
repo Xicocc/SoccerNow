@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.RefereeRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.RefereeNotFoundException;
 import pt.ul.fc.css.soccernow.model.Referee;
+import pt.ul.fc.css.soccernow.model.User;
 import pt.ul.fc.css.soccernow.model.UserType;
 import pt.ul.fc.css.soccernow.repository.RefereeRepository;
 
@@ -39,18 +40,48 @@ public class RefereeService {
   }
 
   public Referee addGamesParticipated(Long refereeId, int games) {
-    Referee referee =
-        (Referee)
-            refereeRepository
-                .findById(refereeId)
-                .orElseThrow(() -> new RefereeNotFoundException(refereeId));
+    Referee referee = getRefereeById(refereeId);
 
     if (games < 0) {
       throw new IllegalArgumentException("Games cannot be negative");
     }
 
     referee.setGamesParticipated(referee.getGamesParticipated() + games);
-
     return refereeRepository.save(referee);
+  }
+
+  public Referee addCardsShown(Long refereeId, int cards) {
+    Referee referee = getRefereeById(refereeId);
+
+    if (cards < 0) {
+      throw new IllegalArgumentException("Cards cannot be negative");
+    }
+
+    referee.setCardsShown(referee.getCardsShown() + cards);
+    return refereeRepository.save(referee);
+  }
+
+  public Referee getRefereeById(Long id) {
+    User user = refereeRepository.findById(id).orElseThrow(() -> new RefereeNotFoundException(id));
+    if (!(user instanceof Referee)) {
+      throw new IllegalArgumentException("User with ID " + id + " is not a referee.");
+    }
+    return (Referee) user;
+  }
+
+  public Referee getRefereeByName(String name) {
+    Referee referee = refereeRepository.findByName(name);
+    if (referee == null) {
+      throw new RefereeNotFoundException(name);
+    }
+    return referee;
+  }
+
+  public List<Referee> getRefereesByGamesParticipated(int games) {
+    return refereeRepository.findByGamesParticipated(games);
+  }
+
+  public List<Referee> getRefereesByCardsShown(int cards) {
+    return refereeRepository.findByCardsShown(cards);
   }
 }

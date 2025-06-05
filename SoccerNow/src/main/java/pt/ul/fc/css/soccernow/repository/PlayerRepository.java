@@ -28,4 +28,13 @@ public interface PlayerRepository extends UserRepository {
 
   @Query("SELECT p FROM Player p ORDER BY p.redCards DESC LIMIT :limit")
   List<Player> findTopPlayersByRedCards(int limit);
+
+  @Query("SELECT p FROM Player p WHERE p.goalsScored = :goals")
+  List<Player> findByGoalsScored(int goals);
+
+  @Query("SELECT p FROM Player p WHERE (p.yellowCards + p.redCards) = :cards")
+  List<Player> findByTotalCards(int cards);
+
+  @Query("SELECT p FROM Player p WHERE p.gamesPlayed = :games")
+  List<Player> findByGamesPlayed(int games);
 }

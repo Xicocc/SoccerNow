@@ -96,4 +96,32 @@ public class ChampionshipController {
     championshipService.deleteChampionship(id);
     return ResponseEntity.ok().build();
   }
+
+  @Operation(summary = "Filter championships by name (partial match, case-insensitive)")
+  @ApiResponse(responseCode = "200", description = "List of championships matching the name")
+  @GetMapping("/filter-by-name")
+  public ResponseEntity<List<Championship>> getChampionshipsByName(
+      @Parameter(description = "Partial name to match") @RequestParam String name) {
+    return ResponseEntity.ok(championshipService.getChampionshipsByName(name));
+  }
+
+  @Operation(summary = "Filter championships by number of games played")
+  @ApiResponse(
+      responseCode = "200",
+      description = "List of championships with specified games played")
+  @GetMapping("/filter-by-games-played")
+  public ResponseEntity<List<Championship>> getChampionshipsByGamesPlayed(
+      @Parameter(description = "Number of games already played") @RequestParam long count) {
+    return ResponseEntity.ok(championshipService.getChampionshipsByGamesPlayed(count));
+  }
+
+  @Operation(summary = "Filter championships by number of games remaining")
+  @ApiResponse(
+      responseCode = "200",
+      description = "List of championships with specified games remaining")
+  @GetMapping("/filter-by-games-remaining")
+  public ResponseEntity<List<Championship>> getChampionshipsByGamesRemaining(
+      @Parameter(description = "Number of games remaining to play") @RequestParam long count) {
+    return ResponseEntity.ok(championshipService.getChampionshipsByGamesRemaining(count));
+  }
 }

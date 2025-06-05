@@ -122,4 +122,26 @@ public class PlayerController {
       @Parameter(description = "Name of the player") @RequestParam String name) {
     return ResponseEntity.ok(playerService.getPlayerByName(name));
   }
+
+  @Operation(summary = "Get players by exact number of goals scored")
+  @GetMapping("/by-goals")
+  public ResponseEntity<List<Player>> getPlayersByGoals(
+      @Parameter(description = "Exact number of goals scored") @RequestParam int goals) {
+    return ResponseEntity.ok(playerService.getPlayersByGoalsScored(goals));
+  }
+
+  @Operation(summary = "Get players by exact number of total cards received")
+  @GetMapping("/by-cards")
+  public ResponseEntity<List<Player>> getPlayersByCards(
+      @Parameter(description = "Exact total number of cards (yellow + red)") @RequestParam
+          int cards) {
+    return ResponseEntity.ok(playerService.getPlayersByTotalCards(cards));
+  }
+
+  @Operation(summary = "Get players by exact number of games played")
+  @GetMapping("/by-games")
+  public ResponseEntity<List<Player>> getPlayersByGamesPlayed(
+      @Parameter(description = "Exact number of games played") @RequestParam int games) {
+    return ResponseEntity.ok(playerService.getPlayersByGamesPlayed(games));
+  }
 }

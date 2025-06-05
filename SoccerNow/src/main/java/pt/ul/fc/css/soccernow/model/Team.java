@@ -16,6 +16,15 @@ public class Team {
   @Column(name = "wins", columnDefinition = "integer default 0")
   private int wins = 0;
 
+  @Column(name = "losses", columnDefinition = "integer default 0")
+  private int losses = 0;
+
+  @Column(name = "draws", columnDefinition = "integer default 0")
+  private int draws = 0;
+
+  @Column(name = "titles", columnDefinition = "integer default 0")
+  private int titles = 0;
+
   @ManyToMany
   @JoinTable(
       name = "team_players",
@@ -58,6 +67,30 @@ public class Team {
 
   public void setPlayers(List<Player> players) {
     this.players = players;
+  }
+
+  public int getLosses() {
+    return losses;
+  }
+
+  public void setLosses(int losses) {
+    this.losses = losses;
+  }
+
+  public int getDraws() {
+    return draws;
+  }
+
+  public void setDraws(int draws) {
+    this.draws = draws;
+  }
+
+  public int getTitles() {
+    return titles;
+  }
+
+  public void setTitles(int titles) {
+    this.titles = titles;
   }
 
   // Helper method to get only player IDs

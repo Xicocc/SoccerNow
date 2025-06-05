@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.TeamRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.TeamNotFoundException;
 import pt.ul.fc.css.soccernow.model.Player;
+import pt.ul.fc.css.soccernow.model.Position;
 import pt.ul.fc.css.soccernow.model.Team;
 import pt.ul.fc.css.soccernow.model.User;
 import pt.ul.fc.css.soccernow.repository.PlayerRepository;
@@ -28,19 +29,16 @@ public class TeamService {
   }
 
   public Team registerTeam(TeamRegistrationDTO dto) {
-    // Validate input
     if (dto == null || dto.getName() == null || dto.getName().trim().isEmpty()) {
       throw new IllegalArgumentException("Team name cannot be empty");
     }
 
     String name = dto.getName().trim();
 
-    // Case-insensitive check for existing team
     if (teamRepository.existsByName(name)) {
       throw new IllegalArgumentException("Team name already exists");
     }
 
-    // Check against user names (case-sensitive as per your User model)
     if (userRepository.existsByName(name)) {
       throw new IllegalArgumentException("Name conflicts with existing user");
     }
@@ -51,17 +49,14 @@ public class TeamService {
     return teamRepository.save(team);
   }
 
-  // Get all teams
   public List<Team> getAllTeams() {
     return teamRepository.findAllTeams();
   }
 
-  // Get team by ID with not found handling
   public Team getTeamById(Long teamId) {
     return teamRepository.findById(teamId).orElseThrow(() -> new TeamNotFoundException(teamId));
   }
 
-  // Add existing Player (User subclass) to team
   public Team addPlayerToTeam(Long teamId, Long userId) {
     Team team = getTeamById(teamId);
     User user =
@@ -81,7 +76,6 @@ public class TeamService {
     return team;
   }
 
-  // Remove player from team
   public Team removePlayerFromTeam(Long teamId, Long userId) {
     Team team = getTeamById(teamId);
     User user =
@@ -98,12 +92,10 @@ public class TeamService {
     return teamRepository.save(team);
   }
 
-  // Get all players in a team
   public List<Player> getTeamPlayers(Long teamId) {
     return getTeamById(teamId).getPlayers();
   }
 
-  // Get teams with specific player
   public List<Team> getTeamsWithPlayer(Long userId) {
     User user =
         userRepository
@@ -117,40 +109,34 @@ public class TeamService {
     return teamRepository.findByPlayerId(userId);
   }
 
-  // Teams with less than 5 players
   public List<Team> getTeamsWithLessThan5Players() {
     return teamRepository.findTeamsWithLessThan5Players();
   }
 
-  // Teams ordered by total cards (yellow + red)
   public List<Team> getTeamsWithMostCards() {
     return teamRepository.findTeamsWithMostCards();
   }
 
-  // Teams ordered by wins
   public List<Team> getTeamsWithMostWins() {
     return teamRepository.findTeamsWithMostWins();
   }
 
-  // Increment team's win count
   public Team addWins(Long teamId, int wins) {
     if (wins <= 0) {
       throw new IllegalArgumentException("Wins must be a positive number");
     }
 
     Team team = getTeamById(teamId);
-    team.setWins(team.getWins() + wins); // Add multiple wins at once
+    team.setWins(team.getWins() + wins);
     return teamRepository.save(team);
   }
 
-  // Calculate total cards for a team
   public int getTeamCardCount(Long teamId) {
     return getTeamById(teamId).getPlayers().stream()
         .mapToInt(p -> p.getYellowCards() + p.getRedCards())
         .sum();
   }
 
-  // Get teams where player name matches
   public List<Team> getTeamsWithPlayerName(String playerName) {
     return teamRepository.findByPlayerName(playerName);
   }
@@ -158,5 +144,59 @@ public class TeamService {
   public void removeTeam(Long teamId) {
     Team team = getTeamById(teamId);
     teamRepository.delete(team);
+  }
+
+  public List<Team> getTeamsByNumberOfPlayers(int count) {
+    return teamRepository.findByNumberOfPlayers(count);
+  }
+
+  public List<Team> getTeamsByWins(int wins) {
+    return teamRepository.findByWins(wins);
+  }
+
+  public List<Team> getTeamsByDraws(int draws) {
+    return teamRepository.findByDraws(draws);
+  }
+
+  public List<Team> getTeamsByLosses(int losses) {
+    return teamRepository.findByLosses(losses);
+  }
+
+  public List<Team> getTeamsByTitles(int titles) {
+    return teamRepository.findByTitles(titles);
+  }
+
+  public List<Team> getTeamsMissingPosition(Position position) {
+    return teamRepository.findTeamsMissingPosition(position);
+  }
+
+  public Team addDraws(Long teamId, int draws) {
+    if (draws <= 0) {
+      throw new IllegalArgumentException("Draws must be a positive number");
+    }
+
+    Team team = getTeamById(teamId);
+    team.setDraws(team.getDraws() + draws);
+    return teamRepository.save(team);
+  }
+
+  public Team addLosses(Long teamId, int losses) {
+    if (losses <= 0) {
+      throw new IllegalArgumentException("Losses must be a positive number");
+    }
+
+    Team team = getTeamById(teamId);
+    team.setLosses(team.getLosses() + losses);
+    return teamRepository.save(team);
+  }
+
+  public Team addTitles(Long teamId, int titles) {
+    if (titles <= 0) {
+      throw new IllegalArgumentException("Titles must be a positive number");
+    }
+
+    Team team = getTeamById(teamId);
+    team.setTitles(team.getTitles() + titles);
+    return teamRepository.save(team);
   }
 }

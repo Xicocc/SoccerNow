@@ -7,15 +7,8 @@ import pt.ul.fc.css.soccernow.dto.GameRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.ChampionshipNotFoundException;
 import pt.ul.fc.css.soccernow.exceptions.GameNotFoundException;
 import pt.ul.fc.css.soccernow.exceptions.TeamNotFoundException;
-import pt.ul.fc.css.soccernow.model.Championship;
-import pt.ul.fc.css.soccernow.model.Game;
-import pt.ul.fc.css.soccernow.model.GameStatus;
-import pt.ul.fc.css.soccernow.model.Referee;
-import pt.ul.fc.css.soccernow.model.Team;
-import pt.ul.fc.css.soccernow.repository.ChampionshipRepository;
-import pt.ul.fc.css.soccernow.repository.GameRepository;
-import pt.ul.fc.css.soccernow.repository.TeamRepository;
-import pt.ul.fc.css.soccernow.repository.UserRepository;
+import pt.ul.fc.css.soccernow.model.*;
+import pt.ul.fc.css.soccernow.repository.*;
 
 @Service
 public class GameService {
@@ -36,19 +29,16 @@ public class GameService {
     this.userRepository = userRepository;
   }
 
-  // Register a new game (can be with or without championship)
   public Game registerGame(GameRegistrationDTO dto) {
     validateGameDTO(dto);
 
     Team homeTeam = getTeamByName(dto.getHomeTeamName());
     Team awayTeam = getTeamByName(dto.getAwayTeamName());
-
     validateTeams(homeTeam, awayTeam);
 
     LocalDateTime gameTime = dto.getGameTime() != null ? dto.getGameTime() : LocalDateTime.now();
     Game game = new Game(homeTeam, awayTeam, gameTime, dto.getLocation());
 
-    // Set referee if provided
     if (dto.getRefereeId() != null && dto.getRefereeId() > 0) {
       Referee referee =
           (Referee)
@@ -56,18 +46,15 @@ public class GameService {
                   .findById(dto.getRefereeId())
                   .orElseThrow(
                       () -> new RuntimeException("Referee not found: " + dto.getRefereeId()));
-
       game.setReferee(referee);
     }
 
     Long champId = dto.getChampionshipId() != null ? dto.getChampionshipId() : 0L;
-
     if (champId > 0) {
       Championship championship =
           championshipRepository
               .findById(champId)
               .orElseThrow(() -> new ChampionshipNotFoundException(champId));
-
       game.setChampionshipId(championship.getId());
       game = gameRepository.save(game);
 
@@ -77,7 +64,6 @@ public class GameService {
       if (!championship.getParticipatingTeams().contains(awayTeam)) {
         championship.addTeam(awayTeam);
       }
-
       championshipRepository.save(championship);
     } else {
       game.setChampionshipId(0L);
@@ -87,7 +73,6 @@ public class GameService {
     return game;
   }
 
-  // Get all games a team participated in by team name
   public List<Game> getGamesByTeamName(String teamName) {
     if (teamName == null || teamName.isBlank()) {
       throw new IllegalArgumentException("Team name cannot be empty");
@@ -95,7 +80,6 @@ public class GameService {
     return gameRepository.findByTeamName(teamName.trim());
   }
 
-  // Get games by championship
   public List<Game> getGamesByChampionship(Long championshipId) {
     if (championshipId == null) {
       throw new IllegalArgumentException("Championship ID cannot be null");
@@ -103,17 +87,14 @@ public class GameService {
     return gameRepository.findByChampionshipId(championshipId);
   }
 
-  // Get standalone games (not part of any championship)
   public List<Game> getStandaloneGames() {
     return gameRepository.findStandaloneGames();
   }
 
-  // Update the result of a game
   public Game updateResult(Long gameId, int homeScore, int awayScore) {
     if (homeScore < 0 || awayScore < 0) {
       throw new IllegalArgumentException("Scores must be non-negative");
     }
-
     Game game = getGameById(gameId);
     game.setHomeScore(homeScore);
     game.setAwayScore(awayScore);
@@ -121,19 +102,16 @@ public class GameService {
     return gameRepository.save(game);
   }
 
-  // Cancel a game
   public Game cancelGame(Long gameId) {
     Game game = getGameById(gameId);
     game.setStatus(GameStatus.CANCELLED);
     return gameRepository.save(game);
   }
 
-  // Get game by ID with error handling
   public Game getGameById(Long gameId) {
     return gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
   }
 
-  // Get all scheduled/completed/cancelled games
   public List<Game> getScheduledGames() {
     return gameRepository.findScheduledGames();
   }
@@ -154,7 +132,63 @@ public class GameService {
     return gameRepository.findAll();
   }
 
-  // Helper methods
+  public List<Game> getPlayedGames() {
+    return gameRepository.findPlayedGames();
+  }
+
+  public List<Game> getUpcomingGames() {
+    return gameRepository.findUpcomingGames();
+  }
+
+  public List<Game> getGamesByTotalGoals(int goalCount) {
+    return gameRepository.findByTotalGoals(goalCount);
+  }
+
+  public List<Game> getGamesByLocation(String location) {
+    return gameRepository.findByLocation(location);
+  }
+
+  public List<Game> getMorningGames() {
+    return gameRepository.findAll().stream()
+        .filter(
+            g -> {
+              int hour = g.getGameTime().getHour();
+              return hour >= 6 && hour < 12;
+            })
+        .toList();
+  }
+
+  public List<Game> getAfternoonGames() {
+    return gameRepository.findAll().stream()
+        .filter(
+            g -> {
+              int hour = g.getGameTime().getHour();
+              return hour >= 12 && hour < 18;
+            })
+        .toList();
+  }
+
+  public List<Game> getEveningGames() {
+    return gameRepository.findAll().stream()
+        .filter(
+            g -> {
+              int hour = g.getGameTime().getHour();
+              return hour >= 18 || hour < 6;
+            })
+        .toList();
+  }
+
+  public Game updateGameLocation(Long gameId, String location) {
+    if (location == null || location.trim().isEmpty()) {
+      throw new IllegalArgumentException("Location must not be empty");
+    }
+
+    Game game = getGameById(gameId);
+    game.setLocation(location.trim());
+    return gameRepository.save(game);
+  }
+
+  // Helpers
   private void validateGameDTO(GameRegistrationDTO dto) {
     if (dto == null || dto.getHomeTeamName() == null || dto.getAwayTeamName() == null) {
       throw new IllegalArgumentException("Both team names must be provided");

@@ -129,4 +129,16 @@ public class PlayerService {
     return (Player)
         playerRepository.findById(id).orElseThrow(() -> new PlayerNotFoundException(id));
   }
+
+  public List<Player> getPlayersByGoalsScored(int goals) {
+    return playerRepository.findByGoalsScored(goals);
+  }
+
+  public List<Player> getPlayersByTotalCards(int cards) {
+    return playerRepository.findByTotalCards(cards);
+  }
+
+  public List<Player> getPlayersByGamesPlayed(int games) {
+    return playerRepository.findByGamesPlayed(games);
+  }
 }

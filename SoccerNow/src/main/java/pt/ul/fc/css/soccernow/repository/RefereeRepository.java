@@ -13,4 +13,13 @@ public interface RefereeRepository extends UserRepository {
 
   @Query("SELECT r FROM Referee r " + "ORDER BY r.gamesParticipated DESC " + "LIMIT 1")
   Referee findTopRefereeByGamesParticipated();
+
+  @Query("SELECT r FROM Referee r WHERE r.name = :name")
+  Referee findByName(String name);
+
+  @Query("SELECT r FROM Referee r WHERE r.gamesParticipated = :games")
+  List<Referee> findByGamesParticipated(int games);
+
+  @Query("SELECT r FROM Referee r WHERE r.cardsShown = :cards")
+  List<Referee> findByCardsShown(int cards);
 }
