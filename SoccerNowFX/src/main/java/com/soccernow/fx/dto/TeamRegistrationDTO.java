@@ -7,6 +7,9 @@ public class TeamRegistrationDTO {
   private String name;
   private Integer wins;
   private List<PlayerRegistrationDTO> players;
+  private Integer losses;
+  private Integer draws;
+  private Integer titles;
 
   public TeamRegistrationDTO() {}
 
@@ -32,6 +35,30 @@ public class TeamRegistrationDTO {
 
   public void setWins(Integer wins) {
     this.wins = wins;
+  }
+
+  public Integer getLosses() {
+    return losses;
+  }
+
+  public void setLosses(Integer losses) {
+    this.losses = losses;
+  }
+
+  public Integer getDraws() {
+    return draws;
+  }
+
+  public void setDraws(Integer draws) {
+    this.draws = draws;
+  }
+
+  public Integer getTitles() {
+    return titles;
+  }
+
+  public void setTitles(Integer titles) {
+    this.titles = titles;
   }
 
   public List<PlayerRegistrationDTO> getPlayers() {

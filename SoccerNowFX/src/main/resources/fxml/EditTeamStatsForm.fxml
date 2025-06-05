@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.HBox?>
 
-<VBox alignment="CENTER" prefHeight="180.0" prefWidth="320.0"
+<VBox alignment="CENTER" prefHeight="220.0" prefWidth="320.0"
       xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.soccernow.fx.controller.EditTeamStatsFormController"
@@ -22,6 +22,21 @@
       </Label>
       <Label fx:id="lblTeamId" text="1 - Team A" alignment="CENTER" style="-fx-font-weight: bold;" />
          <TextField fx:id="txtGamesWon" alignment="CENTER" promptText="Games Won">
+               <VBox.margin>
+               <Insets left="30.0" right="30.0" top="8.0"/>
+               </VBox.margin>
+         </TextField>
+         <TextField fx:id="txtGamesLoss" alignment="CENTER" promptText="Games Lost">
+               <VBox.margin>
+               <Insets left="30.0" right="30.0" top="8.0"/>
+               </VBox.margin>
+         </TextField>
+         <TextField fx:id="txtGamesDrawn" alignment="CENTER" promptText="Games Drawn">
+               <VBox.margin>
+               <Insets left="30.0" right="30.0" top="8.0"/>
+               </VBox.margin>
+         </TextField>
+         <TextField fx:id="txtTitles" alignment="CENTER" promptText="Titles">
                <VBox.margin>
                <Insets left="30.0" right="30.0" top="8.0"/>
                </VBox.margin>

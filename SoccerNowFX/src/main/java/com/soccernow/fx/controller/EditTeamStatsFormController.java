@@ -16,17 +16,27 @@ public class EditTeamStatsFormController {
 
   @FXML private Label lblTeamId;
   @FXML private TextField txtGamesWon;
+  @FXML private TextField txtGamesLoss;
+  @FXML private TextField txtGamesDrawn;
+  @FXML private TextField txtTitles;
   @FXML private Button btnConfirm;
   @FXML private Button btnCancel;
 
   private Long teamId;
   private Runnable onStatsUpdated; // Callback to refresh table
 
-  public void setTeamInfo(long teamId, String teamName, long gamesWon) {
+  public void setTeamInfo(
+      long teamId, String teamName, long gamesWon, long GamesLoss, long gamesDrawn, long titles) {
     this.teamId = teamId;
     lblTeamId.setText(teamId + " - " + teamName);
-    txtGamesWon.setText(""); // Clear field
+    txtGamesWon.setText("");
+    txtGamesLoss.setText("");
+    txtGamesDrawn.setText("");
+    txtTitles.setText("");
     txtGamesWon.setPromptText("Games Won: " + gamesWon);
+    txtGamesLoss.setPromptText("Games Lost: " + GamesLoss);
+    txtGamesDrawn.setPromptText("Games Drawn: " + gamesDrawn);
+    txtTitles.setPromptText("Titles: " + titles);
   }
 
   public void setOnStatsUpdated(Runnable callback) {
@@ -40,26 +50,68 @@ public class EditTeamStatsFormController {
 
   @FXML
   private void onConfirm() {
-    String gamesWonText = txtGamesWon.getText().trim();
-    if (gamesWonText.isEmpty()) {
-      showAlert(Alert.AlertType.WARNING, "No Input", "Please enter a value.");
+    StringBuilder result = new StringBuilder();
+    boolean anyFieldUpdated = false;
+    boolean anyError = false;
+
+    // Validate and patch each field if not empty
+    if (!txtGamesWon.getText().trim().isEmpty()) {
+      Long value = parseNonNegative(txtGamesWon.getText().trim(), "Games Won");
+      if (value == null) {
+        anyError = true;
+      } else {
+        anyFieldUpdated = true;
+        boolean success = sendPatch("wins", value);
+        result.append(success ? "Games won updated!\n" : "Failed to update games won.\n");
+        if (!success) anyError = true;
+      }
+    }
+    if (!txtGamesLoss.getText().trim().isEmpty()) {
+      Long value = parseNonNegative(txtGamesLoss.getText().trim(), "Games Lost");
+      if (value == null) {
+        anyError = true;
+      } else {
+        anyFieldUpdated = true;
+        boolean success = sendPatch("losses", value);
+        result.append(success ? "Games lost updated!\n" : "Failed to update games lost.\n");
+        if (!success) anyError = true;
+      }
+    }
+    if (!txtGamesDrawn.getText().trim().isEmpty()) {
+      Long value = parseNonNegative(txtGamesDrawn.getText().trim(), "Games Drawn");
+      if (value == null) {
+        anyError = true;
+      } else {
+        anyFieldUpdated = true;
+        boolean success = sendPatch("draws", value);
+        result.append(success ? "Games drawn updated!\n" : "Failed to update games drawn.\n");
+        if (!success) anyError = true;
+      }
+    }
+    if (!txtTitles.getText().trim().isEmpty()) {
+      Long value = parseNonNegative(txtTitles.getText().trim(), "Titles");
+      if (value == null) {
+        anyError = true;
+      } else {
+        anyFieldUpdated = true;
+        boolean success = sendPatch("titles", value);
+        result.append(success ? "Titles updated!\n" : "Failed to update titles.\n");
+        if (!success) anyError = true;
+      }
+    }
+
+    if (!anyFieldUpdated) {
+      showAlert(Alert.AlertType.WARNING, "No Input", "Please enter a value in at least one field.");
       return;
     }
 
-    long gamesWon = Long.parseLong(gamesWonText);
-
-    if (gamesWon < 0) {
-      showAlert(Alert.AlertType.WARNING, "Invalid Input", "Games won cannot be negative.");
-      return;
-    }
-
-    boolean success = sendPatch(teamId, gamesWon);
-    if (success) {
-      showAlert(Alert.AlertType.INFORMATION, "Success", "Games won updated!");
+    // Show results
+    if (anyError) {
+      showAlert(Alert.AlertType.WARNING, "Update Result", result.toString());
+    } else {
+      showAlert(Alert.AlertType.INFORMATION, "Success", result.toString());
       if (onStatsUpdated != null) onStatsUpdated.run();
       closeWindow();
-    } else {
-      showAlert(Alert.AlertType.ERROR, "Failed", "Failed to update games won.");
     }
   }
 
@@ -73,9 +125,29 @@ public class EditTeamStatsFormController {
     stage.close();
   }
 
-  private boolean sendPatch(Long id, long gamesWon) {
-    String endpoint =
-        String.format("http://localhost:8080/api/teams/%d/wins?wins=%d", id, gamesWon);
+  // Send PATCH to the appropriate endpoint
+  private boolean sendPatch(String type, long value) {
+    // Endpoint mapping
+    String endpoint;
+    switch (type) {
+      case "wins":
+        endpoint = String.format("http://localhost:8080/api/teams/%d/wins?wins=%d", teamId, value);
+        break;
+      case "losses":
+        endpoint =
+            String.format("http://localhost:8080/api/teams/%d/losses?losses=%d", teamId, value);
+        break;
+      case "draws":
+        endpoint =
+            String.format("http://localhost:8080/api/teams/%d/draws?draws=%d", teamId, value);
+        break;
+      case "titles":
+        endpoint =
+            String.format("http://localhost:8080/api/teams/%d/titles?titles=%d", teamId, value);
+        break;
+      default:
+        return false;
+    }
     try {
       HttpClient client = HttpClient.newHttpClient();
       HttpRequest request =
@@ -90,6 +162,21 @@ public class EditTeamStatsFormController {
     } catch (Exception e) {
       e.printStackTrace();
       return false;
+    }
+  }
+
+  // Utility: parse and validate non-negative integer
+  private Long parseNonNegative(String text, String fieldName) {
+    try {
+      long value = Long.parseLong(text);
+      if (value < 0) {
+        showAlert(Alert.AlertType.WARNING, "Invalid Input", fieldName + " cannot be negative.");
+        return null;
+      }
+      return value;
+    } catch (NumberFormatException e) {
+      showAlert(Alert.AlertType.WARNING, "Invalid Input", fieldName + " must be a number.");
+      return null;
     }
   }
 

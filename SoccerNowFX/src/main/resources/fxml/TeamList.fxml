@@ -22,6 +22,9 @@
                 <TableColumn fx:id="colID" text="ID" />
                 <TableColumn fx:id="colName" text="Name" />
                 <TableColumn fx:id="colWins" text="Wins" />
+                <TableColumn fx:id="colLosses" text="Losses" />
+                <TableColumn fx:id="colDraws" text="Draws" />
+                <TableColumn fx:id="colTitles" text="Titles" />
                 <TableColumn fx:id="colNumPlayers" text="Players" />
                 <TableColumn fx:id="colPlayers" text="Players" />
             </columns>

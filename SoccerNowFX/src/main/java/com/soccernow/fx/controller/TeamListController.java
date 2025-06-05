@@ -37,6 +37,9 @@ public class TeamListController {
   @FXML private TableColumn<TeamRegistrationDTO, Number> colWins;
   @FXML private TableColumn<TeamRegistrationDTO, Number> colNumPlayers;
   @FXML private TableColumn<TeamRegistrationDTO, String> colPlayers;
+  @FXML private TableColumn<TeamRegistrationDTO, Number> colLosses;
+  @FXML private TableColumn<TeamRegistrationDTO, Number> colDraws;
+  @FXML private TableColumn<TeamRegistrationDTO, Number> colTitles;
 
   @FXML private Button btnBack;
   @FXML private Button btnAddTeam;
@@ -52,6 +55,9 @@ public class TeamListController {
     colID.setCellValueFactory(new PropertyValueFactory<>("id"));
     colName.setCellValueFactory(new PropertyValueFactory<>("name"));
     colWins.setCellValueFactory(new PropertyValueFactory<>("wins"));
+    colLosses.setCellValueFactory(new PropertyValueFactory<>("losses"));
+    colDraws.setCellValueFactory(new PropertyValueFactory<>("draws"));
+    colTitles.setCellValueFactory(new PropertyValueFactory<>("titles"));
     colNumPlayers.setCellValueFactory(
         cellData -> {
           TeamRegistrationDTO team = cellData.getValue();
@@ -386,7 +392,10 @@ public class TeamListController {
       dialogController.setTeamInfo(
           selected.getId() != null ? selected.getId().longValue() : 0L,
           selected.getName(),
-          selected.getWins() != null ? selected.getWins().longValue() : 0L);
+          selected.getWins() != null ? selected.getWins().longValue() : 0L,
+          selected.getLosses() != null ? selected.getLosses().longValue() : 0L,
+          selected.getDraws() != null ? selected.getDraws().longValue() : 0L,
+          selected.getTitles() != null ? selected.getTitles().longValue() : 0L);
       dialogController.setOnStatsUpdated(this::fetchTeamsFromBackend);
 
       javafx.stage.Stage dialogStage = new javafx.stage.Stage();

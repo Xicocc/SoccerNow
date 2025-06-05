@@ -6,13 +6,14 @@ import com.google.gson.reflect.TypeToken;
 import com.soccernow.fx.dto.ChampionshipRegistrationDTO;
 import com.soccernow.fx.dto.RefereeRegistrationDTO;
 import com.soccernow.fx.dto.TeamRegistrationDTO;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -22,25 +23,16 @@ import javafx.util.StringConverter;
 
 public class AddGameFormController {
 
-  // Use Object type so you can add both String and DTO to the ComboBox
   @FXML private ComboBox<Object> comboChampionship;
   @FXML private ComboBox<TeamRegistrationDTO> comboTeamA;
   @FXML private ComboBox<TeamRegistrationDTO> comboTeamB;
   @FXML private ComboBox<RefereeRegistrationDTO> comboReferee;
   @FXML private DatePicker dateGame;
+  @FXML private ComboBox<Integer> comboHour;
+  @FXML private ComboBox<Integer> comboMinute;
+  @FXML private TextField txtLocation;
   @FXML private Button btnConfirm;
   @FXML private Button btnCancel;
-
-  private GameDataListener listener;
-
-  public interface GameDataListener {
-    void onGameDataEntered(
-        Long championshipId, String teamAName, String teamBName, LocalDate date, Long refereeId);
-  }
-
-  public void setGameDataListener(GameDataListener listener) {
-    this.listener = listener;
-  }
 
   @FXML
   public void initialize() {
@@ -48,18 +40,22 @@ public class AddGameFormController {
     populateTeams();
     populateReferees();
 
-    // Converter for championship, handles String and DTO
+    comboHour.getItems().clear();
+    for (int h = 0; h < 24; h++) comboHour.getItems().add(h);
+    comboHour.setPromptText("Hour");
+
+    comboMinute.getItems().clear();
+    for (int m = 0; m < 60; m++) comboMinute.getItems().add(m);
+    comboMinute.setPromptText("Minute");
+
     comboChampionship.setConverter(
         new StringConverter<>() {
           @Override
           public String toString(Object obj) {
-            if (obj instanceof ChampionshipRegistrationDTO dto) {
+            if (obj instanceof ChampionshipRegistrationDTO dto)
               return dto.getName() + " (ID:" + dto.getId() + ")";
-            } else if (obj instanceof String str) {
-              return str;
-            } else {
-              return "";
-            }
+            else if (obj instanceof String str) return str;
+            else return "";
           }
 
           @Override
@@ -117,6 +113,9 @@ public class AddGameFormController {
     TeamRegistrationDTO selectedTeamB = comboTeamB.getValue();
     RefereeRegistrationDTO selectedReferee = comboReferee.getValue();
     LocalDate date = dateGame.getValue();
+    Integer hour = comboHour.getValue();
+    Integer minute = comboMinute.getValue();
+    String location = txtLocation.getText().trim();
 
     boolean valid = true;
     StringBuilder errorMsg = new StringBuilder();
@@ -125,7 +124,20 @@ public class AddGameFormController {
     comboTeamB.setStyle("");
     dateGame.setStyle("");
     comboReferee.setStyle("");
+    comboHour.setStyle("");
+    comboMinute.setStyle("");
+    txtLocation.setStyle("");
 
+    if (hour == null) {
+      comboHour.setStyle("-fx-border-color: red;");
+      errorMsg.append("Hour must be selected.\n");
+      valid = false;
+    }
+    if (minute == null) {
+      comboMinute.setStyle("-fx-border-color: red;");
+      errorMsg.append("Minute must be selected.\n");
+      valid = false;
+    }
     if (selectedTeamA == null) {
       comboTeamA.setStyle("-fx-border-color: red;");
       errorMsg.append("Home Team must be selected.\n");
@@ -154,6 +166,11 @@ public class AddGameFormController {
       errorMsg.append("Home Team and Away Team cannot be the same.\n");
       valid = false;
     }
+    if (location.isEmpty()) {
+      txtLocation.setStyle("-fx-border-color: red;");
+      errorMsg.append("Location must be filled.\n");
+      valid = false;
+    }
 
     if (!valid) {
       Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -164,20 +181,67 @@ public class AddGameFormController {
       return;
     }
 
-    // Determine championshipId (null if "No Championship" is selected)
-    Long championshipId = null;
+    // Combine date, hour, minute into UTC ISO8601 string
+    String gameTime;
+    {
+      LocalDateTime dt = date.atTime(hour, minute);
+      ZonedDateTime zdt = dt.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
+      gameTime = zdt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+    }
+
+    // Championship ID (0 if "No Championship")
+    long championshipId = 0L;
     if (selectedChampionship instanceof ChampionshipRegistrationDTO dto) {
       championshipId = dto.getId();
     }
 
-    if (listener != null) {
-      listener.onGameDataEntered(
-          championshipId,
-          selectedTeamA.getName(),
-          selectedTeamB.getName(),
-          date,
-          selectedReferee.getId());
-      closeWindow();
+    // Prepare JSON payload as a Map (no unused POJO, direct to Gson)
+    var payload = new java.util.LinkedHashMap<String, Object>();
+    payload.put("homeTeamName", selectedTeamA.getName());
+    payload.put("awayTeamName", selectedTeamB.getName());
+    payload.put("gameTime", gameTime);
+    payload.put("location", location);
+    payload.put("championshipId", championshipId);
+    payload.put("refereeId", selectedReferee.getId());
+
+    String jsonPayload = new Gson().toJson(payload);
+
+    // POST in a background thread
+    new Thread(
+            () -> {
+              boolean ok = sendAddGameRequest(jsonPayload);
+              Platform.runLater(
+                  () -> {
+                    Alert alert =
+                        new Alert(ok ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR);
+                    alert.setTitle(ok ? "Success" : "Failed");
+                    alert.setHeaderText(null);
+                    alert.setContentText(ok ? "Game added successfully!" : "Failed to add game.");
+                    alert.showAndWait();
+                    if (ok) closeWindow();
+                  });
+            })
+        .start();
+  }
+
+  private boolean sendAddGameRequest(String jsonPayload) {
+    try {
+      String endpoint = "http://localhost:8080/api/games";
+      URI uri = URI.create(endpoint);
+      HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+      conn.setRequestMethod("POST");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setDoOutput(true);
+      try (OutputStream os = conn.getOutputStream()) {
+        byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+      }
+      int code = conn.getResponseCode();
+      conn.disconnect();
+      return code == 200 || code == 201;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
   }
 
@@ -206,9 +270,7 @@ public class AddGameFormController {
                     new BufferedReader(new InputStreamReader((conn.getInputStream())));
                 StringBuilder jsonBuilder = new StringBuilder();
                 String output;
-                while ((output = br.readLine()) != null) {
-                  jsonBuilder.append(output);
-                }
+                while ((output = br.readLine()) != null) jsonBuilder.append(output);
                 conn.disconnect();
 
                 Gson gson =
@@ -224,6 +286,7 @@ public class AddGameFormController {
                                 (date, type, context) ->
                                     new com.google.gson.JsonPrimitive(date.toString()))
                         .create();
+
                 Type listType = new TypeToken<List<ChampionshipRegistrationDTO>>() {}.getType();
                 List<ChampionshipRegistrationDTO> championships =
                     gson.fromJson(jsonBuilder.toString(), listType);
@@ -257,9 +320,7 @@ public class AddGameFormController {
                     new BufferedReader(new InputStreamReader((conn.getInputStream())));
                 StringBuilder jsonBuilder = new StringBuilder();
                 String output;
-                while ((output = br.readLine()) != null) {
-                  jsonBuilder.append(output);
-                }
+                while ((output = br.readLine()) != null) jsonBuilder.append(output);
                 conn.disconnect();
 
                 Gson gson =
@@ -275,6 +336,7 @@ public class AddGameFormController {
                                 (date, type, context) ->
                                     new com.google.gson.JsonPrimitive(date.toString()))
                         .create();
+
                 Type listType = new TypeToken<List<TeamRegistrationDTO>>() {}.getType();
                 List<TeamRegistrationDTO> teams = gson.fromJson(jsonBuilder.toString(), listType);
 
@@ -305,9 +367,7 @@ public class AddGameFormController {
                     new BufferedReader(new InputStreamReader((conn.getInputStream())));
                 StringBuilder jsonBuilder = new StringBuilder();
                 String output;
-                while ((output = br.readLine()) != null) {
-                  jsonBuilder.append(output);
-                }
+                while ((output = br.readLine()) != null) jsonBuilder.append(output);
                 conn.disconnect();
 
                 Gson gson =
@@ -323,6 +383,7 @@ public class AddGameFormController {
                                 (date, type, context) ->
                                     new com.google.gson.JsonPrimitive(date.toString()))
                         .create();
+
                 Type listType = new TypeToken<List<RefereeRegistrationDTO>>() {}.getType();
                 List<RefereeRegistrationDTO> referees =
                     gson.fromJson(jsonBuilder.toString(), listType);

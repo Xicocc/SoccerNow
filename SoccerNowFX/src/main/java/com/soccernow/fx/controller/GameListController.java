@@ -8,7 +8,6 @@ import com.soccernow.fx.dto.GameRegistrationDTO;
 import com.soccernow.fx.util.AppWindowManager;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -46,6 +45,7 @@ public class GameListController {
 
   @FXML private Button btnAddGame;
   @FXML private Button btnEditGame;
+  @FXML private Button btnCancelGame;
   @FXML private Button btnDeleteGame;
   @FXML private Button btnBack;
 
@@ -56,6 +56,10 @@ public class GameListController {
   public void initialize() {
     fetchChampionships();
     fetchGamesFromBackend();
+
+    btnCancelGame
+        .disableProperty()
+        .bind(tableGames.getSelectionModel().selectedItemProperty().isNull());
 
     colId.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("id"));
 
@@ -104,7 +108,21 @@ public class GameListController {
         });
 
     colDate.setCellValueFactory(
-        cellData -> new SimpleStringProperty(cellData.getValue().getFormattedDate()));
+        cellData -> {
+          String gameTimeStr = cellData.getValue().getGameTime();
+          if (gameTimeStr == null || gameTimeStr.isEmpty()) {
+            return new SimpleStringProperty("-");
+          }
+          try {
+            java.time.LocalDateTime ldt = java.time.LocalDateTime.parse(gameTimeStr);
+            String formatted =
+                ldt.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+            return new SimpleStringProperty(formatted);
+          } catch (Exception e) {
+            return new SimpleStringProperty(gameTimeStr);
+          }
+        });
+
     colStatus.setCellValueFactory(
         cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
     colLocation.setCellValueFactory(
@@ -256,12 +274,6 @@ public class GameListController {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AddGameForm.fxml"));
       Parent root = loader.load();
 
-      AddGameFormController dialogController = loader.getController();
-      dialogController.setGameDataListener(
-          (championshipId, teamAName, teamBName, date, refereeId) -> {
-            addGameToBackend(championshipId, teamAName, teamBName, date, refereeId);
-          });
-
       Stage dialogStage = new Stage();
       dialogStage.setTitle("Add Game");
       dialogStage.setScene(new Scene(root));
@@ -269,6 +281,7 @@ public class GameListController {
       dialogStage.setResizable(false);
       dialogStage.showAndWait();
 
+      // Refresh data after dialog closes
       fetchChampionships();
       fetchGamesFromBackend();
     } catch (Exception e) {
@@ -276,66 +289,66 @@ public class GameListController {
     }
   }
 
-  private void addGameToBackend(
-      Long championshipId,
-      String teamAName,
-      String teamBName,
-      java.time.LocalDate date,
-      Long refereeId) {
-    String endpoint = "http://localhost:8080/api/games";
-    try {
-      URI uri = URI.create(endpoint);
-      URL url = uri.toURL();
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.setRequestMethod("POST");
-      conn.setRequestProperty("Content-Type", "application/json");
-      conn.setDoOutput(true);
-
-      StringBuilder sb = new StringBuilder();
-      sb.append("{");
-      sb.append("\"homeTeamName\":\"").append(teamAName).append("\",");
-      sb.append("\"awayTeamName\":\"").append(teamBName).append("\",");
-      sb.append("\"gameTime\":\"").append(date.toString()).append("T00:00:00.000Z\",");
-      sb.append("\"location\":\"\",");
-      sb.append("\"championshipId\":")
-          .append(championshipId != null ? championshipId : 0)
-          .append(",");
-      sb.append("\"refereeId\":").append(refereeId != null ? refereeId : 0);
-      sb.append("}");
-
-      String jsonInputString = sb.toString();
-
-      try (OutputStream os = conn.getOutputStream()) {
-        byte[] input = jsonInputString.getBytes("utf-8");
-        os.write(input, 0, input.length);
-      }
-
-      int responseCode = conn.getResponseCode();
-      conn.disconnect();
-
-      if (responseCode == 201 || responseCode == 200) {
-        fetchGamesFromBackend();
-        Platform.runLater(
-            () -> {
-              Alert alert = new Alert(AlertType.INFORMATION);
-              alert.setTitle("Game Added");
-              alert.setHeaderText(null);
-              alert.setContentText("Game added successfully!");
-              alert.showAndWait();
+  @FXML
+  private void handleCancelGame() {
+    GameRegistrationDTO selected = tableGames.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      Alert alert = new Alert(AlertType.WARNING);
+      alert.setTitle("No Selection");
+      alert.setHeaderText(null);
+      alert.setContentText("Please select a game to cancel.");
+      alert.showAndWait();
+      return;
+    }
+    Alert confirmationAlert = new Alert(AlertType.CONFIRMATION);
+    confirmationAlert.setTitle("Confirm Cancel");
+    confirmationAlert.setHeaderText(null);
+    confirmationAlert.setContentText(
+        "Are you sure you want to cancel game: "
+            + selected.getHomeTeamName()
+            + " vs "
+            + selected.getAwayTeamName()
+            + " (ID: "
+            + selected.getId()
+            + ")?");
+    confirmationAlert
+        .showAndWait()
+        .ifPresent(
+            response -> {
+              if (response == ButtonType.OK) {
+                int code = sendCancelGame(selected.getId());
+                if (code == 200 || code == 204) {
+                  Alert confirmAlert = new Alert(AlertType.INFORMATION);
+                  confirmAlert.setTitle("Game Canceled");
+                  confirmAlert.setHeaderText(null);
+                  confirmAlert.setContentText("Game canceled successfully.");
+                  confirmAlert.showAndWait();
+                  fetchGamesFromBackend();
+                } else {
+                  Alert errorAlert = new Alert(AlertType.ERROR);
+                  errorAlert.setTitle("Error");
+                  errorAlert.setHeaderText(null);
+                  errorAlert.setContentText("Cancel failed! (Error code: " + code + ")");
+                  errorAlert.showAndWait();
+                }
+              }
             });
-      } else {
-        throw new RuntimeException("Failed : HTTP error code : " + responseCode);
-      }
+  }
+
+  private int sendCancelGame(Long gameId) {
+    try {
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create("http://localhost:8080/api/games/" + gameId + "/cancel"))
+              .method("PATCH", HttpRequest.BodyPublishers.noBody())
+              .header("Accept", "*/*")
+              .build();
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      return response.statusCode();
     } catch (Exception e) {
       e.printStackTrace();
-      Platform.runLater(
-          () -> {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Add Game Failed");
-            alert.setHeaderText(null);
-            alert.setContentText("Failed to add game: " + e.getMessage());
-            alert.showAndWait();
-          });
+      return -1;
     }
   }
 
