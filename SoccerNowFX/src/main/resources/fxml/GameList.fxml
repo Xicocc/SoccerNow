@@ -48,8 +48,6 @@
                      prefWidth="140.0" prefHeight="35.0"/>
                <Button fx:id="btnCancelGame" mnemonicParsing="false" text="Cancel Game" onAction="#handleCancelGame"
                      prefWidth="120.0" prefHeight="35.0"/>
-               <Button fx:id="btnDeleteGame" mnemonicParsing="false" text="Delete Game" onAction="#handleDeleteGame"
-                     prefWidth="120.0" prefHeight="35.0"/>
             </children>
          </HBox>
       </VBox>

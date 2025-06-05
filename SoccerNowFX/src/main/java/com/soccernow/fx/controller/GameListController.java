@@ -46,7 +46,6 @@ public class GameListController {
   @FXML private Button btnAddGame;
   @FXML private Button btnEditGame;
   @FXML private Button btnCancelGame;
-  @FXML private Button btnDeleteGame;
   @FXML private Button btnBack;
 
   private final ObservableList<GameRegistrationDTO> gameList = FXCollections.observableArrayList();
@@ -140,9 +139,6 @@ public class GameListController {
     tableGames.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     tableGames.setItems(gameList);
 
-    btnDeleteGame
-        .disableProperty()
-        .bind(tableGames.getSelectionModel().selectedItemProperty().isNull());
     btnEditGame
         .disableProperty()
         .bind(tableGames.getSelectionModel().selectedItemProperty().isNull());
@@ -383,69 +379,6 @@ public class GameListController {
       fetchGamesFromBackend();
     } catch (Exception e) {
       e.printStackTrace();
-    }
-  }
-
-  @FXML
-  private void handleDeleteGame() {
-    GameRegistrationDTO selected = tableGames.getSelectionModel().getSelectedItem();
-    if (selected == null) {
-      Alert alert = new Alert(AlertType.WARNING);
-      alert.setTitle("No Selection");
-      alert.setHeaderText(null);
-      alert.setContentText("Please select a game to delete.");
-      alert.showAndWait();
-      return;
-    }
-    Alert confirmationAlert = new Alert(AlertType.CONFIRMATION);
-    confirmationAlert.setTitle("Confirm Delete");
-    confirmationAlert.setHeaderText(null);
-    confirmationAlert.setContentText(
-        "Are you sure you want to delete game: "
-            + selected.getHomeTeamName()
-            + " vs "
-            + selected.getAwayTeamName()
-            + " (ID: "
-            + selected.getId()
-            + ")?");
-    confirmationAlert
-        .showAndWait()
-        .ifPresent(
-            response -> {
-              if (response == ButtonType.OK) {
-                int code = sendDeleteGame(selected.getId());
-                if (code == 200 || code == 204) {
-                  Alert confirmAlert = new Alert(AlertType.INFORMATION);
-                  confirmAlert.setTitle("Game Deleted");
-                  confirmAlert.setHeaderText(null);
-                  confirmAlert.setContentText("Game deleted successfully.");
-                  confirmAlert.showAndWait();
-                  fetchGamesFromBackend();
-                } else {
-                  Alert errorAlert = new Alert(AlertType.ERROR);
-                  errorAlert.setTitle("Error");
-                  errorAlert.setHeaderText(null);
-                  errorAlert.setContentText("Deletion failed! (Error code: " + code + ")");
-                  errorAlert.showAndWait();
-                }
-              }
-            });
-  }
-
-  private int sendDeleteGame(Long gameId) {
-    try {
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest request =
-          HttpRequest.newBuilder()
-              .uri(URI.create("http://localhost:8080/api/games/" + gameId))
-              .DELETE()
-              .header("Accept", "*/*")
-              .build();
-      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-      return response.statusCode();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return -1;
     }
   }
 }
