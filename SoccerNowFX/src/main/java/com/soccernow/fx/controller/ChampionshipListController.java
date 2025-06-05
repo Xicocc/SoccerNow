@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.soccernow.fx.dto.ChampionshipRegistrationDTO;
+import com.soccernow.fx.dto.GameRegistrationDTO;
 import com.soccernow.fx.util.AppWindowManager;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +38,7 @@ public class ChampionshipListController {
   @FXML private TableColumn<ChampionshipRegistrationDTO, String> colStartDate;
   @FXML private TableColumn<ChampionshipRegistrationDTO, String> colEndDate;
   @FXML private TableColumn<ChampionshipRegistrationDTO, String> colLocation;
+  @FXML private TableColumn<ChampionshipRegistrationDTO, String> colGames;
 
   @FXML private Button btnAddChampionship;
   @FXML private Button btnEditChampionship;
@@ -45,6 +47,10 @@ public class ChampionshipListController {
 
   private final ObservableList<ChampionshipRegistrationDTO> championshipList =
       FXCollections.observableArrayList();
+
+  // Games-related fields
+  private List<GameRegistrationDTO> allGames = Collections.emptyList();
+  private final Map<Long, List<GameRegistrationDTO>> championshipGamesMap = new HashMap<>();
 
   @FXML
   public void initialize() {
@@ -81,9 +87,70 @@ public class ChampionshipListController {
               date != null ? date.format(dateFormatter) : "-");
         });
 
+    // Games column
+    colGames.setCellValueFactory(
+        cellData -> {
+          ChampionshipRegistrationDTO championship = cellData.getValue();
+          List<GameRegistrationDTO> games = championshipGamesMap.get(championship.getId());
+          if (games == null || games.isEmpty()) {
+            return new javafx.beans.property.SimpleStringProperty("-");
+          } else {
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            for (GameRegistrationDTO game : games) {
+              if (i > 0) sb.append("; ");
+              sb.append(game.getHomeTeamName())
+                  .append(":")
+                  .append(game.getAwayTeamName())
+                  .append("(ID:")
+                  .append(game.getId())
+                  .append(")");
+              i++;
+              if (i % 2 == 0) sb.append("\n"); // Wrap every 2 games
+            }
+            return new javafx.beans.property.SimpleStringProperty(sb.toString());
+          }
+        });
+    // Reuse the TeamListController label-wrap logic for games
+    colGames.setCellFactory(
+        tc ->
+            new TableCell<ChampionshipRegistrationDTO, String>() {
+              private final Label label = new Label();
+
+              {
+                label.setWrapText(true);
+                label.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                setAlignment(javafx.geometry.Pos.TOP_LEFT);
+                label.maxWidthProperty().bind(tc.widthProperty().subtract(12));
+                label.prefWidthProperty().bind(tc.widthProperty().subtract(12));
+              }
+
+              @Override
+              protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                  setGraphic(null);
+                  setPrefHeight(Control.USE_COMPUTED_SIZE);
+                } else {
+                  label.setText(item);
+                  setGraphic(label);
+                  Platform.runLater(
+                      () -> {
+                        double needed = label.prefHeight(label.getWidth());
+                        label.setMinHeight(needed);
+                        label.setPrefHeight(needed);
+                        setMinHeight(needed);
+                        setPrefHeight(needed);
+                      });
+                }
+              }
+            });
+
     tableChampionships.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     tableChampionships.setItems(championshipList);
 
+    fetchGamesFromBackend(); // Load games BEFORE championships for mapping
     fetchChampionshipsFromBackend();
 
     btnDeleteChampionship
@@ -94,6 +161,43 @@ public class ChampionshipListController {
         .bind(tableChampionships.getSelectionModel().selectedItemProperty().isNull());
 
     Platform.runLater(() -> btnBack.requestFocus());
+  }
+
+  private void fetchGamesFromBackend() {
+    String endpoint = "http://localhost:8080/api/games";
+    try {
+      URI uri = URI.create(endpoint);
+      URL url = uri.toURL();
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Accept", "application/json");
+      if (conn.getResponseCode() != 200)
+        throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      StringBuilder jsonBuilder = new StringBuilder();
+      String output;
+      while ((output = br.readLine()) != null) jsonBuilder.append(output);
+      conn.disconnect();
+      Gson gson = new GsonBuilder().create();
+      Type listType = new TypeToken<List<GameRegistrationDTO>>() {}.getType();
+      allGames = gson.fromJson(jsonBuilder.toString(), listType);
+
+      // Map games by championshipId (only true championship games, >0)
+      championshipGamesMap.clear();
+      for (GameRegistrationDTO g : allGames) {
+        if (g.getChampionshipId() != null
+            && g.getChampionshipId() > 0
+            && Boolean.TRUE.equals(g.getChampionshipGame())) {
+          championshipGamesMap
+              .computeIfAbsent(g.getChampionshipId(), k -> new ArrayList<>())
+              .add(g);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      allGames = Collections.emptyList();
+      championshipGamesMap.clear();
+    }
   }
 
   private void fetchChampionshipsFromBackend() {
@@ -136,6 +240,7 @@ public class ChampionshipListController {
       championshipList.clear();
       championshipList.addAll(championships);
 
+      Platform.runLater(() -> tableChampionships.refresh());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -226,6 +331,7 @@ public class ChampionshipListController {
       conn.disconnect();
 
       if (responseCode == 201 || responseCode == 200) {
+        fetchGamesFromBackend();
         fetchChampionshipsFromBackend();
         Platform.runLater(
             () -> {
@@ -269,7 +375,11 @@ public class ChampionshipListController {
 
       EditChampionshipFormController dialogController = loader.getController();
       dialogController.setChampionshipInfo(selected);
-      dialogController.setOnChampionshipUpdated(this::fetchChampionshipsFromBackend);
+      dialogController.setOnChampionshipUpdated(
+          () -> {
+            fetchGamesFromBackend();
+            fetchChampionshipsFromBackend();
+          });
 
       Stage dialogStage = new Stage();
       dialogStage.setTitle("Edit Championship");
@@ -311,6 +421,7 @@ public class ChampionshipListController {
                   confirmAlert.setHeaderText(null);
                   confirmAlert.setContentText("Championship deleted successfully.");
                   confirmAlert.showAndWait();
+                  fetchGamesFromBackend();
                   fetchChampionshipsFromBackend();
                 } else {
                   Alert errorAlert = new Alert(AlertType.ERROR);
