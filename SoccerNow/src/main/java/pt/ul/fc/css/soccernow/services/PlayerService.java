@@ -141,4 +141,40 @@ public class PlayerService {
   public List<Player> getPlayersByGamesPlayed(int games) {
     return playerRepository.findByGamesPlayed(games);
   }
+
+  public List<Player> filterPlayers(
+      String name, String positionStr, Integer goals, Integer cards, Integer games) {
+    List<Player> result = getAllPlayers();
+
+    if (name != null && !name.isBlank()) {
+      try {
+        result.retainAll(List.of(getPlayerByName(name)));
+      } catch (PlayerNotFoundException e) {
+        result.clear();
+      }
+    }
+
+    if (positionStr != null && !positionStr.isBlank()) {
+      try {
+        Position positionEnum = Position.valueOf(positionStr.toUpperCase());
+        result.retainAll(getPlayersByPosition(positionEnum));
+      } catch (IllegalArgumentException e) {
+        result.clear(); // unknown position value
+      }
+    }
+
+    if (goals != null) {
+      result.retainAll(getPlayersByGoalsScored(goals));
+    }
+
+    if (cards != null) {
+      result.retainAll(getPlayersByTotalCards(cards));
+    }
+
+    if (games != null) {
+      result.retainAll(getPlayersByGamesPlayed(games));
+    }
+
+    return result;
+  }
 }

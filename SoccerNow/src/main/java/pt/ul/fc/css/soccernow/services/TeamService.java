@@ -2,6 +2,7 @@ package pt.ul.fc.css.soccernow.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.TeamRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.TeamNotFoundException;
@@ -198,5 +199,29 @@ public class TeamService {
     Team team = getTeamById(teamId);
     team.setTitles(team.getTitles() + titles);
     return teamRepository.save(team);
+  }
+
+  public List<Team> filterTeams(
+      String name,
+      Integer numPlayers,
+      Integer minWins,
+      Integer minDraws,
+      Integer minLosses,
+      Integer minTitles,
+      String missingPosition) {
+    return teamRepository.findAll().stream()
+        .filter(team -> name == null || team.getName().toLowerCase().contains(name.toLowerCase()))
+        .filter(team -> numPlayers == null || team.getPlayers().size() == numPlayers)
+        .filter(team -> minWins == null || team.getWins() >= minWins)
+        .filter(team -> minDraws == null || team.getDraws() >= minDraws)
+        .filter(team -> minLosses == null || team.getLosses() >= minLosses)
+        .filter(team -> minTitles == null || team.getTitles() >= minTitles)
+        .filter(
+            team ->
+                missingPosition == null
+                    || team.getPlayers().stream()
+                        .noneMatch(
+                            p -> p.getPreferredPosition().name().equalsIgnoreCase(missingPosition)))
+        .collect(Collectors.toList());
   }
 }

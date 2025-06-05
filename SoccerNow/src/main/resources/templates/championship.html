@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Championships</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <h2 class="text-center">Championship List</h2>
+
+  <form method="get" th:action="@{/championships}" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <input type="text" name="name" class="form-control" placeholder="Name" th:value="${name}">
+    </div>
+    <div class="col-md-4">
+      <input type="text" name="location" class="form-control" placeholder="Location" th:value="${location}">
+    </div>
+    <div class="col-md-4">
+      <select class="form-select" name="status" th:value="${status}">
+        <option value="">Status</option>
+        <option value="SCHEDULED">Scheduled</option>
+        <option value="ONGOING">Ongoing</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+    </div>
+    <div class="col-md-2 mt-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Location</th>
+      <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="championship : ${championships}">
+      <td th:text="${championship.name}">Name</td>
+      <td th:text="${championship.description}">Description</td>
+      <td th:text="${#temporals.format(championship.startDate, 'yyyy-MM-dd')}">Start</td>
+      <td th:text="${#temporals.format(championship.endDate, 'yyyy-MM-dd')}">End</td>
+      <td th:text="${championship.location}">Location</td>
+      <td th:text="${championship.status}">Status</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

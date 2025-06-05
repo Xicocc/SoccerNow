@@ -1,6 +1,7 @@
 package pt.ul.fc.css.soccernow.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.ChampionshipRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.ChampionshipNotFoundException;
@@ -90,6 +91,16 @@ public class ChampionshipService {
   public void deleteChampionship(Long id) {
     Championship championship = getChampionshipById(id);
     championshipRepository.delete(championship);
+  }
+
+  public List<Championship> filterChampionships(
+      String name, String location, ChampionshipStatus status) {
+    return championshipRepository.findAll().stream()
+        .filter(c -> name == null || c.getName().toLowerCase().contains(name.toLowerCase()))
+        .filter(
+            c -> location == null || c.getLocation().toLowerCase().contains(location.toLowerCase()))
+        .filter(c -> status == null || c.getStatus() == status)
+        .collect(Collectors.toList());
   }
 
   // Helper validation

@@ -1,6 +1,7 @@
 package pt.ul.fc.css.soccernow.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import pt.ul.fc.css.soccernow.dto.RefereeRegistrationDTO;
 import pt.ul.fc.css.soccernow.exceptions.RefereeNotFoundException;
@@ -83,5 +84,15 @@ public class RefereeService {
 
   public List<Referee> getRefereesByCardsShown(int cards) {
     return refereeRepository.findByCardsShown(cards);
+  }
+
+  public List<Referee> filterReferees(String name, Integer minGames, Integer minCards) {
+    return refereeRepository.findAll().stream()
+        .filter(user -> user instanceof Referee)
+        .map(user -> (Referee) user)
+        .filter(r -> name == null || r.getName().toLowerCase().contains(name.toLowerCase()))
+        .filter(r -> minGames == null || r.getGamesParticipated() >= minGames)
+        .filter(r -> minCards == null || r.getCardsShown() >= minCards)
+        .collect(Collectors.toList());
   }
 }
