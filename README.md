@@ -86,6 +86,8 @@ The following UML class diagram shows the main entities, repositories, services,
 
 ![Class Diagram](docs/ClassDiagram.png)
 
+You'll find both the **.puml** and **diagram** files in the [`docs/`](docs) folder.
+
 ---
 
 ## 👥 Credits & Attribution
